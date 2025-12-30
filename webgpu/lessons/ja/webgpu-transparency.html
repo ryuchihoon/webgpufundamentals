@@ -1,0 +1,1473 @@
+<!DOCTYPE html><!-- this file is auto-generated from webgpu/lessons/ja/webgpu-transparency.md. Do not edited directly --><!--
+Copyright 2023, GfxFundamentals Contributors
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+* Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
+  distribution.
+
+* Neither the name of GfxFundamentals nor the names of the
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--><html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="WebGPUでのピクセルのブレンディング">
+<meta name="keywords" content="webgpu graphics">
+<meta name="thumbnail" content="https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-transparency_ja.jpg">
+
+<meta property="og:title" content="WebGPUの透明度とブレンディング">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-transparency_ja.jpg">
+<meta property="og:description" content="WebGPUでのピクセルのブレンディング">
+<meta property="og:url" content="https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-transparency.html">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@greggman">
+<meta name="twitter:creator" content="@greggman">
+<meta name="twitter:domain" content="webgpufundamentals.org">
+<meta name="twitter:title" content="WebGPUの透明度とブレンディング">
+<meta name="twitter:url" content="https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-transparency.html">
+<meta name="twitter:description" content="WebGPUでのピクセルのブレンディング">
+<meta name="twitter:image:src" content="https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-transparency_ja.jpg">
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {
+      "@type":"WebSite",
+      "@id":"https://webgpufundamentals.org/#website",
+      "url":"https://webgpufundamentals.org/",
+      "name":"webgpufundamentals"
+    },
+    {
+      "@type":"ImageObject",
+      "@id":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-transparency.html#primaryimage",
+      "url":"https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-transparency_ja.jpg",
+      "width":1200,
+      "height":630
+    },
+    {
+      "@type":"WebPage",
+      "@id":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-transparency.html#webpage",
+      "url":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-transparency.html",
+      "inLanguage":"ja",
+      "name":"WebGPUの透明度とブレンディング",
+      "keywords":"webgpu graphics programming",
+      "isPartOf":{
+        "@id":"https://webgpufundamentals.org/#website"
+      },
+      "primaryImageOfPage":{
+        "@id":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-transparency.html#primaryimage"
+      }
+    }
+  ]
+}
+</script>
+
+<title>WebGPUの透明度とブレンディング</title>
+<link href="/webgpu/lessons/resources/webgpufundamentals-icon.png" rel="shortcut icon" type="image/png">
+<link rel="apple-touch-icon" href="/webgpu/lessons/resources/webgpufundamentals-icon.png">
+<link rel="icon" href="/webgpu/lessons/resources/webgpufundamentals-icon.png">
+
+<link rel="stylesheet" href="/webgpu/lessons/lang.css">
+<link rel="stylesheet" href="/webgpu/lessons/resources/lesson.css">
+</head>
+<body>
+<div class="webgpu_navbar">
+  <div>
+    <select class="language">
+    <option value="/webgpu/lessons/webgpu-transparency.html">English
+    </option><option value="/webgpu/lessons/es/webgpu-transparency.html">Spanish
+    </option><option value="/webgpu/lessons/ja/webgpu-transparency.html" selected="">日本語
+    </option><option value="/webgpu/lessons/ko/webgpu-transparency.html">한국어
+    </option><option value="/webgpu/lessons/ru/webgpu-transparency.html">Русский
+    </option><option value="/webgpu/lessons/tr/webgpu-transparency.html">Türkçe
+    </option><option value="/webgpu/lessons/uk/webgpu-transparency.html">Українська
+    </option><option value="/webgpu/lessons/zh_cn/webgpu-transparency.html">简体中文
+</option></select>
+
+
+    <a href="#toc">目次</a>
+    <input type="search" placeholder="?" id="search">
+  </div>
+</div>
+<div class="webgpu_header">
+  <h1><a href="/webgpu/lessons/ja/">webgpufundamentals.org</a></h1>
+<style>
+#forkongithub>div {
+    background: #000;
+    color: #fff;
+    font-family: arial,sans-serif;
+    text-align: center;
+    font-weight: bold;
+    padding: 5px 40px;
+    font-size: 0.9rem;
+    line-height: 1.3rem;
+    position: relative;
+    transition: 0.5s;
+    display: block;
+    width: 400px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translateX(160px) rotate(45deg) translate(10px,70px);
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.8);
+    pointer-events: auto;
+}
+#forkongithub a {
+  text-decoration: none;
+  color: #fff;
+}
+#forkongithub>div:hover {
+    background: #c11;
+    color: #fff;
+}
+#forkongithub .contributors {
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.2);
+  line-height: 1.2;
+  padding: 0.1em;
+}
+#forkongithub>div::before,#forkongithub>div::after {
+    content: "";
+    width: 100%;
+    display: block;
+    position: absolute;
+    top: 1px;
+    left: 0;
+    height: 1px;
+    background: #fff;
+}
+#forkongithub>div::after {
+    bottom: 1px;
+    top: auto;
+}
+
+#forkongithub{
+    z-index: 9999;
+    /* needed for firefox */
+    overflow: hidden;
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    pointer-events: none;
+}
+#forkongithub svg{
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+#forkongithub img {
+  width: 1em;
+  height: 1em;
+  border-radius: 100%;
+  vertical-align: middle;
+}
+
+@media (max-width: 900px) {
+    #forkongithub>div {
+        line-height: 1.2rem;
+    }
+}
+@media (max-width: 700px) {
+  #forkongithub {
+    display: none;
+  }
+}
+@media (max-width: 410px) {
+    #forkongithub>div {
+        font-size: 0.7rem;
+        transform: translateX(150px) rotate(45deg) translate(20px,40px);
+    }
+}
+
+</style>
+<div id="forkongithub">
+  <div>
+    <div><a href="https://github.com/webgpu/webgpufundamentals">Fix, Fork, Contribute <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+
+<svg width="100%" height="100%" viewBox="0 0 136 133" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(3.92891,0,0,3.92891,67.867,129.125)">
+        <path d="M0,-31.904C-8.995,-31.904 -16.288,-24.611 -16.288,-15.614C-16.288,-8.417 -11.621,-2.312 -5.148,-0.157C-4.333,-0.008 -4.036,-0.511 -4.036,-0.943C-4.036,-1.329 -4.05,-2.354 -4.058,-3.713C-8.589,-2.729 -9.545,-5.897 -9.545,-5.897C-10.286,-7.779 -11.354,-8.28 -11.354,-8.28C-12.833,-9.29 -11.242,-9.27 -11.242,-9.27C-9.607,-9.155 -8.747,-7.591 -8.747,-7.591C-7.294,-5.102 -4.934,-5.821 -4.006,-6.238C-3.858,-7.29 -3.438,-8.008 -2.972,-8.415C-6.589,-8.826 -10.392,-10.224 -10.392,-16.466C-10.392,-18.244 -9.757,-19.698 -8.715,-20.837C-8.883,-21.249 -9.442,-22.905 -8.556,-25.148C-8.556,-25.148 -7.188,-25.586 -4.076,-23.478C-2.777,-23.84 -1.383,-24.02 0.002,-24.026C1.385,-24.02 2.779,-23.84 4.08,-23.478C7.19,-25.586 8.555,-25.148 8.555,-25.148C9.444,-22.905 8.885,-21.249 8.717,-20.837C9.761,-19.698 10.392,-18.244 10.392,-16.466C10.392,-10.208 6.583,-8.831 2.954,-8.428C3.539,-7.925 4.06,-6.931 4.06,-5.411C4.06,-3.234 4.04,-1.477 4.04,-0.943C4.04,-0.507 4.333,0 5.16,-0.159C11.628,-2.318 16.291,-8.419 16.291,-15.614C16.291,-24.611 8.997,-31.904 0,-31.904" style="fill:white;"></path>
+    </g>
+</svg>
+</a></div>
+  </div>
+</div>
+
+</div>
+
+
+<div class="container">
+  <div class="lesson-title">
+    <h1>WebGPUの透明度とブレンディング</h1>
+  </div>
+  <div class="lesson">
+    <div class="lesson-main">
+      <div class="warn">この記事はGemini Code Assistによって自動翻訳されました。翻訳に問題がある場合は、お手数ですが<a href="https://github.com/webgpu/webgpufundamentals/pulls">こちら</a>からPull Requestを送信してください。</div>
+<p>透明度とブレンディングについて説明するのは難しいです。なぜなら、ある状況で必要なことは、別の状況で必要なこととは異なることが多いからです。したがって、この記事は主にWebGPUの機能のツアーになり、特定のテクニックについて説明するときにここを参照できるようにします。</p>
+<h2 id="キャンバスのalphamode"><a href="../a-alphamode"></a>キャンバスの<code class="notranslate" translate="no">alphaMode</code></h2>
+<p>最初に注意すべきことは、WebGPU内には透明度とブレンディングがありますが、WebGPUキャンバスとHTMLページにも透明度とブレンディングがあるということです。</p>
+<p>デフォルトでは、WebGPUキャンバスは不透明です。そのアルファチャネルは無視されます。無視されないようにするには、<code class="notranslate" translate="no">configure</code>を呼び出すときに<code class="notranslate" translate="no">alphaMode</code>を<code class="notranslate" translate="no">'premultiplied'</code>に設定する必要があります。デフォルトは<code class="notranslate" translate="no">'opaque'</code>です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  context.configure({
+    device,
+    format: presentationFormat,
++    alphaMode: 'premultiplied',
+  });
+</pre>
+<p><code class="notranslate" translate="no">alphaMode: 'premultiplied'</code>が何を意味するかを理解することが重要です。これは、キャンバスに入力する色の色値が、すでにアルファ値で乗算されている必要があることを意味します。</p>
+<p>できるだけ小さな例を作成しましょう。レンダーパスを作成し、クリアカラーを設定するだけです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function main() {
+  const adapter = await navigator.gpu?.requestAdapter();
+  const device = await adapter?.requestDevice();
+  if (!device) {
+    fail('need a browser that supports WebGPU');
+    return;
+  }
+
+  // Get a WebGPU context from the canvas and configure it
+  const canvas = document.querySelector('canvas');
+  const context = canvas.getContext('webgpu');
+  const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+  context.configure({
+    device,
+    format: presentationFormat,
++    alphaMode: 'premultiplied',
+  });
+
+  const clearValue = [1, 0, 0, 0.01];
+  const renderPassDescriptor = {
+    label: 'our basic canvas renderPass',
+    colorAttachments: [
+      {
+        // view: &lt;- to be filled out when we render
+        clearValue,
+        loadOp: 'clear',
+        storeOp: 'store',
+      },
+    ],
+  };
+
+  function render() {
+    const encoder = device.createCommandEncoder({ label: 'clear encoder' });
+    const canvasTexture = context.getCurrentTexture();
+    renderPassDescriptor.colorAttachments[0].view =
+        canvasTexture.createView();
+
+    const pass = encoder.beginRenderPass(renderPassDescriptor);
+    pass.end();
+
+    const commandBuffer = encoder.finish();
+    device.queue.submit([commandBuffer]);
+  }
+
+  const observer = new ResizeObserver(entries =&gt; {
+    for (const entry of entries) {
+      const canvas = entry.target;
+      const width = entry.contentBoxSize[0].inlineSize;
+      const height = entry.contentBoxSize[0].blockSize;
+      canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+      canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+      render();
+    }
+  });
+  observer.observe(canvas);
+}
+</pre>
+<p>キャンバスのCSS背景を灰色のチェッカーボードに設定しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">canvas {
+  background-color: #404040;
+  background-image:
+     linear-gradient(45deg, #808080 25%, transparent 25%),
+     linear-gradient(-45deg, #808080 25%, transparent 25%),
+     linear-gradient(45deg, transparent 75%, #808080 75%),
+     linear-gradient(-45deg, transparent 75%, #808080 75%);
+  background-size: 32px 32px;
+  background-position: 0 0, 0 16px, 16px -16px, -16px 0px;
+}
+</pre>
+<p>それに、クリア値のアルファと色、およびそれが事前乗算されているかどうかを設定できるUIを追加しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+import GUI from '../3rdparty/muigui-0.x.module.js';
+
+...
+
++  const color = [1, 0, 0];
++  const settings = {
++    premultiply: false,
++    color,
++    alpha: 0.01,
++  };
++
++  const gui = new GUI().onChange(render);
++  gui.add(settings, 'premultiply');
++  gui.add(settings, 'alpha', 0, 1);
++  gui.addColor(settings, 'color');
+
+  function render() {
+    const encoder = device.createCommandEncoder({ label: 'clear encoder' });
+    const canvasTexture = context.getCurrentTexture();
+    renderPassDescriptor.colorAttachments[0].view =
+        canvasTexture.createView();
+
++    const { alpha } = settings;
++    clearValue[3] = alpha;
++    if (settings.premultiply) {
++      // 色をアルファで事前乗算します
++      clearValue[0] = color[0] * alpha;
++      clearValue[1] = color[1] * alpha;
++      clearValue[2] = color[2] * alpha;
++    } else {
++      // 事前乗算されていない色を使用します
++      clearValue[0] = color[0];
++      clearValue[1] = color[1];
++      clearValue[2] = color[2];
++    }
+
+    const pass = encoder.beginRenderPass(renderPassDescriptor);
+    pass.end();
+
+    const commandBuffer = encoder.finish();
+    device.queue.submit([commandBuffer]);
+  }
+</pre>
+<p>これを実行すると、問題が発生することがわかると思います。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-canvas-alphamode-premultiplied.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-canvas-alphamode-premultiplied.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>ここに表示される色は<strong>未定義</strong>です!!!</p>
+<p>私のマシンでは、これらの色になりました。</p>
+<img src="../resources/canvas-invalid-color.png" class="center" style="width: 440px">
+<p>何が問題かわかりますか？アルファを0.01に設定しました。背景色は中程度の灰色と濃い灰色のはずです。色は赤（1、0、0）に設定されています。中程度/濃い灰色のチェッカーボードの上に0.01の量の赤を置くと、ほとんど知覚できないはずですが、なぜ2つの明るいピンクの色合いなのでしょうか？</p>
+<p>その理由は、<strong>これは不正な色です！</strong>。キャンバスの色は<code class="notranslate" translate="no">1, 0, 0, 0.01</code>ですが、これは事前乗算された色ではありません。「事前乗算」とは、キャンバスに入力する色が、すでにアルファ値で乗算されている必要があることを意味します。アルファ値が0.01の場合、他の値は0.01より大きくてはなりません。</p>
+<p>「事前乗算」チェックボックスをクリックすると、コードは色を事前乗算します。キャンバスに入力される値は<code class="notranslate" translate="no">0.01, 0, 0, 0.01</code>になり、正しく表示され、ほとんど知覚できなくなります。</p>
+<p>「事前乗算」をチェックした状態で、アルファを調整すると、アルファが1に近づくにつれて赤にフェードすることがわかります。</p>
+<blockquote>
+<p>注：例<code class="notranslate" translate="no">1, 0, 0, 0.01</code>は不正な色であるため、どのように表示されるかは未定義です。不正な色で何が起こるかはブラウザ次第なので、不正な色を使用して、デバイス間で同じ結果を期待しないでください。</p>
+</blockquote>
+<p>色が1、0.5、0.25（オレンジ色）で、33％透明にしたいので、アルファが0.33だとします。その場合、「事前乗算された色」は次のようになります。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">                      事前乗算
+   ---------------------------------
+   r = 1    * 0.33   = 0.33
+   g = 0.5  * 0.33   = 0.165
+   g = 0.25 * 0.33   = 0.0825
+   a = 0.33          = 0.33
+</pre>
+<p>事前乗算された色をどのように取得するかはあなた次第です。事前乗算されていない色がある場合は、シェーダーで次のようなコードで事前乗算できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">   return vec4f(color.rgb * color.a, color.a)`;
+</pre>
+<p><a href="webgpu-importing-textures.html">テクスチャのインポートに関する記事</a>で説明した<code class="notranslate" translate="no">copyExternalImageToTexture</code>関数は、<code class="notranslate" translate="no">premultipliedAlpha: true</code>オプションを受け取ります。（<a href="#copyExternalImageToTexture">下記参照</a>）これは、<code class="notranslate" translate="no">copyExternalImageToTexture</code>を呼び出して画像をテクスチャに読み込むときに、テクスチャにコピーするときにWebGPUに色を事前乗算するように指示できることを意味します。そうすれば、<code class="notranslate" translate="no">textureSample</code>を呼び出すときに取得する値はすでに事前乗算されています。</p>
+<p>このセクションのポイントは次のとおりです。</p>
+<ol>
+<li>
+<p><code class="notranslate" translate="no">alphaMode: 'premultiplied'</code> WebGPUキャンバス構成オプションを説明するため。</p>
+<p>これにより、WebGPUキャンバスに透明度を持たせることができます。</p>
+</li>
+<li>
+<p>事前乗算されたアルファ色の概念を紹介するため。</p>
+<p>事前乗算された色をどのように取得するかはあなた次第です。上記の例では、JavaScriptで事前乗算された<code class="notranslate" translate="no">clearValue</code>を作成しました。</p>
+<p>フラグメントシェーダー（および/または）他のシェーダーから色を返すこともできます。それらのシェーダーに事前乗算された色を提供できます。シェーダー自体で乗算を行う場合があります。色を事前乗算するために後処理パスを実行する場合があります。重要なのは、<code class="notranslate" translate="no">alphaMode: 'premultiplied'</code>を使用している場合、キャンバスの色が、何らかの方法で、最終的に事前乗算されることです。</p>
+<p>事前乗算された色と事前乗算されていない色のその他の良い参考文献は、次の記事です。
+<a href="https://www.realtimerendering.com/blog/gpus-prefer-premultiplication/">GPUは事前乗算を好む</a>。</p>
+</li>
+</ol>
+<h2 id="破棄"><a href="../a-discard"></a>破棄</h2>
+<p><code class="notranslate" translate="no">discard</code>は、フラグメントシェーダーで使用して現在のフラグメントを破棄したり、言い換えれば、ピクセルを描画しないようにしたりできるWGSLステートメントです。</p>
+<p><a href="webgpu-inter-stage-variables.html#a-builtin-position">ステージ間変数に関する記事</a>の<code class="notranslate" translate="no">@builtin(position)</code>を使用して、フラグメントシェーダーでチェッカーボードを描画する例を取り上げましょう。</p>
+<p>2色のチェッカーボードを描画する代わりに、2つのケースのいずれかを破棄します。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">@fragment fn fs(fsInput: OurVertexShaderOutput) -&gt; @location(0) vec4f {
+-  let red = vec4f(1, 0, 0, 1);
+  let cyan = vec4f(0, 1, 1, 1);
+
+  let grid = vec2u(fsInput.position.xy) / 8;
+  let checker = (grid.x + grid.y) % 2 == 1;
+
++        if (checker) {
++          discard;
++        }
++
++        return cyan;
+
+-  return select(red, cyan, checker);
+}
+</pre>
+<p>いくつかの他の変更として、キャンバスにCSSチェッカーボードの背景を持たせるために上記のCSSを追加します。また、<code class="notranslate" translate="no">alphaMode: 'premultiplied'</code>を設定します。そして、<code class="notranslate" translate="no">clearValue</code>を<code class="notranslate" translate="no">[0, 0, 0, 0]</code>に設定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  context.configure({
+    device,
+    format: presentationFormat,
++    alphaMode: 'premultiplied',
+  });
+
+  ...
+
+  const renderPassDescriptor = {
+    label: 'our basic canvas renderPass',
+    colorAttachments: [
+      {
+        // view: &lt;- to be filled out when we render
+-        clearValue: [0.3, 0.3, 0.3, 1],
++        clearValue: [0, 0, 0, 0],
+        loadOp: 'clear',
+        storeOp: 'store',
+      },
+    ],
+  };
+...
+
+</pre>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-transparency-fragment-shader-discard.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-transparency-fragment-shader-discard.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>他のすべての正方形が「透明」であり、描画さえされていないことがわかるはずです。</p>
+<p>透明度に使用されるシェーダーでは、アルファ値に基づいて破棄するのが一般的です。次のようなものです。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">@fragment fn fs(fsInput: OurVertexShaderOutput) -&gt; @location(0) vec4f {
+    let color = ... compute a color ....
+
+    if (color.a &lt; threshold) {
+      discard;
+    }
+
+    return color;
+}
+</pre>
+<p>ここで、<code class="notranslate" translate="no">threshold</code>は、ユニフォームからの値、定数、または適切なものであってもかまいません。</p>
+<p>これは、スプライトや、草や葉のような葉に使用されるのが最も一般的です。なぜなら、描画していて、<a href="webgpu-orthograpic-projection.html#a-depth-textures">正射影に関する記事</a>で導入した深度テクスチャを使用している場合、スプライト、葉、または草の葉を描画すると、現在描画しているものの後ろにあるスプライト、葉、または草は、アルファ値が0であっても、深度テクスチャをまだ更新しているため、描画されません。したがって、描画する代わりに破棄します。これについては、別の記事で詳しく説明します。</p>
+<h2 id="ブレンド設定"><a href="../a-blending"></a>ブレンド設定</h2>
+<p>最後に、ブレンド設定について説明します。レンダーパイプラインを作成するとき、フラグメントシェーダーの各<code class="notranslate" translate="no">target</code>に対して、ブレンディング状態を設定できます。つまり、これまでの他の例の典型的なパイプラインは次のとおりです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    const pipeline = device.createRenderPipeline({
+      label: 'hardcoded textured quad pipeline',
+      layout: pipelineLayout,
+      vertex: {
+        module,
+      },
+      fragment: {
+        module,
+        targets: [
+          {
+            format: presentationFormat,
+          },
+        ],
+      },
+    });
+</pre>
+<p>そして、<code class="notranslate" translate="no">target[0]</code>にブレンディングを追加したものは次のとおりです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    const pipeline = device.createRenderPipeline({
+      label: 'hardcoded textured quad pipeline',
+      layout: pipelineLayout,
+      vertex: {
+        module,
+      },
+      fragment: {
+        module,
+        targets: [
+          {
+            format: presentationFormat,
++            blend: {
++              color: {
++                srcFactor: 'one',
++                dstFactor: 'one-minus-src-alpha'
++              },
++              alpha: {
++                srcFactor: 'one',
++                dstFactor: 'one-minus-src-alpha'
++              },
++            },
+          },
+        ],
+      },
+    });
+</pre>
+<p>デフォルト設定の完全なリストは次のとおりです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">blend: {
+  color: {
+    operation: 'add',
+    srcFactor: 'one',
+    dstFactor: 'zero',
+  },
+  alpha: {
+    operation: 'add',
+    srcFactor: 'one',
+    dstFactor: 'zero',
+  },
+}
+</pre>
+<p>ここで、<code class="notranslate" translate="no">color</code>は色の<code class="notranslate" translate="no">rgb</code>部分に何が起こるかであり、<code class="notranslate" translate="no">alpha</code>は<code class="notranslate" translate="no">a</code>（アルファ）部分に何が起こるかです。</p>
+<p><code class="notranslate" translate="no">operation</code>は次のいずれかになります。</p>
+<ul>
+<li>‘add’</li>
+<li>‘subtract’</li>
+<li>‘reverse-subtract’</li>
+<li>‘min’</li>
+<li>‘max’</li>
+</ul>
+<p><code class="notranslate" translate="no">srcFactor</code>と<code class="notranslate" translate="no">dstFactor</code>は、それぞれ次のいずれかになります。</p>
+<ul>
+<li>‘zero’</li>
+<li>‘one’</li>
+<li>‘src’</li>
+<li>‘one-minus-src’</li>
+<li>‘src-alpha’</li>
+<li>‘one-minus-src-alpha’</li>
+<li>‘dst’</li>
+<li>‘one-minus-dst’</li>
+<li>‘dst-alpha’</li>
+<li>‘one-minus-dst-alpha’</li>
+<li>‘src-alpha-saturated’</li>
+<li>‘constant’</li>
+<li>‘one-minus-constant’</li>
+</ul>
+<p>ほとんどは、比較的簡単に理解できます。次のように考えてください。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">   result = operation((src * srcFactor),  (dst * dstFactor))
+</pre>
+<p>ここで、<code class="notranslate" translate="no">src</code>はフラグメントシェーダーから返される値であり、<code class="notranslate" translate="no">dst</code>は描画しているテクスチャにすでにある値です。</p>
+<p><code class="notranslate" translate="no">operation</code>が<code class="notranslate" translate="no">'add'</code>、<code class="notranslate" translate="no">srcFactor</code>が<code class="notranslate" translate="no">'one'</code>、<code class="notranslate" translate="no">dstFactor</code>が<code class="notranslate" translate="no">'zero'</code>であるデフォルトを考えてみましょう。これにより、次のようになります。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">   result = add((src * 1), (dst * 0))
+   result = add(src * 1, dst * 0)
+   result = add(src, 0)
+   result = src;
+</pre>
+<p>ご覧のとおり、デフォルトの結果は<code class="notranslate" translate="no">src</code>になります。</p>
+<p>上記のブレンド係数のうち、2つは定数<code class="notranslate" translate="no">'constant'</code>と<code class="notranslate" translate="no">'one-minus-constant'</code>に言及しています。ここで参照されている定数は、<code class="notranslate" translate="no">setBlendConstant</code>コマンドを使用してレンダーパスで設定され、デフォルトは<code class="notranslate" translate="no">[0, 0, 0, 0]</code>です。これにより、描画間で変更できます。</p>
+<p>おそらく、ブレンディングで最も一般的な設定は次のとおりです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  operation: 'add',
+  srcFactor: 'one',
+  dstFactor: 'one-minus-src-alpha'
+}
+</pre>
+<p>このモードは、「事前乗算されたアルファ」で最もよく使用されます。つまり、上記で説明したように、「src」のRGB色がすでにアルファ値で「事前乗算」されていることを期待します。</p>
+<p>これらのオプションを示す例を作成しましょう。</p>
+<p>まず、アルファを含む2つのキャンバス2D画像を作成するJavaScriptを作成しましょう。これらの2つのキャンバスをWebGPUテクスチャに読み込みます。</p>
+<p>まず、dstテクスチャに使用する画像を作成するためのコードです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const hsl = (h, s, l) =&gt; `hsl(${h * 360 | 0}, ${s * 100}%, ${l * 100 | 0}%)`;
+
+function createDestinationImage(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  const gradient = ctx.createLinearGradient(0, 0, size, size);
+  for (let i = 0; i &lt;= 6; ++i) {
+    gradient.addColorStop(i / 6, hsl(i / -6, 1, 0.5));
+  }
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 255)';
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.rotate(Math.PI / -4);
+  for (let i = 0; i &lt; size * 2; i += 32) {
+    ctx.fillRect(-size, i, size * 2, 16);
+  }
+
+  return canvas;
+}
+</pre>
+<p>そして、実行中です。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-blend-dest-canvas.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-blend-dest-canvas.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>これは、srcテクスチャに使用する画像を作成するためのコードです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const hsla = (h, s, l, a) =&gt; `hsla(${h * 360 | 0}, ${s * 100}%, ${l * 100 | 0}%, ${a})`;
+
+function createSourceImage(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.translate(size / 2, size / 2);
+
+  ctx.globalCompositeOperation = 'screen';
+  const numCircles = 3;
+  for (let i = 0; i &lt; numCircles; ++i) {
+    ctx.rotate(Math.PI * 2 / numCircles);
+    ctx.save();
+    ctx.translate(size / 6, 0);
+    ctx.beginPath();
+
+    const radius = size / 3;
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+
+    const gradient = ctx.createRadialGradient(0, 0, radius / 2, 0, 0, radius);
+    const h = i / numCircles;
+    gradient.addColorStop(0.5, hsla(h, 1, 0.5, 1));
+    gradient.addColorStop(1, hsla(h, 1, 0.5, 0));
+
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.restore();
+  }
+  return canvas;
+}
+</pre>
+<p>そして、実行中です。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-blend-src-canvas.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-blend-src-canvas.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>両方ができたので、<a href="webgpu-import-textures.html#a-loading-canvas">テクスチャのインポートに関する記事</a>のキャンバスインポートの例を変更できます。</p>
+<p>まず、2つのキャンバス画像を作成しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const size = 300;
+const srcCanvas = createSourceImage(size);
+const dstCanvas = createDestinationImage(size);
+</pre>
+<p>シェーダーを変更して、テクスチャ座標を50で乗算しないようにしましょう。遠くに長い平面を描画しようとはしないためです。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">@vertex fn vs(
+  @builtin(vertex_index) vertexIndex : u32
+) -&gt; OurVertexShaderOutput {
+  let pos = array(
+    // 1番目の三角形
+    vec2f( 0.0,  0.0),  // 中央
+    vec2f( 1.0,  0.0),  // 右、中央
+    vec2f( 0.0,  1.0),  // 中央、上
+
+    // 2番目の三角形
+    vec2f( 0.0,  1.0),  // 中央、上
+    vec2f( 1.0,  0.0),  // 右、中央
+    vec2f( 1.0,  1.0),  // 右、上
+  );
+
+  var vsOutput: OurVertexShaderOutput;
+  let xy = pos[vertexIndex];
+  vsOutput.position = uni.matrix * vec4f(xy, 0.0, 1.0);
+-  vsOutput.texcoord = xy * vec2f(1, 50);
++  vsOutput.texcoord = xy;
+  return vsOutput;
+}
+</pre>
+<p><code class="notranslate" translate="no">createTextureFromSource</code>関数を更新して、<code class="notranslate" translate="no">premultipliedAlpha: true/false</code>を渡せるようにし、<code class="notranslate" translate="no">copyExternalTextureToImage</code>に渡すようにしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  function copySourceToTexture(device, texture, source, {flipY} = {}) {
++  function copySourceToTexture(device, texture, source, {flipY, premultipliedAlpha} = {}) {
+    device.queue.copyExternalImageToTexture(
+      { source, flipY, },
+-      { texture },
++      { texture, premultipliedAlpha },
+      { width: source.width, height: source.height },
+    );
+
+    if (texture.mipLevelCount &gt; 1) {
+      generateMips(device, texture);
+    }
+  }
+</pre>
+<p>次に、それを使用して、事前乗算されたものと「事前乗算されていない」もの、または「事前乗算されていない」ものの2つのバージョンの各テクスチャを作成しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const srcTextureUnpremultipliedAlpha =
+      createTextureFromSource(
+          device, srcCanvas,
+          {mips: true});
+  const dstTextureUnpremultipliedAlpha =
+      createTextureFromSource(
+          device, dstCanvas,
+          {mips: true});
+
+  const srcTexturePremultipliedAlpha =
+      createTextureFromSource(
+          device, srcCanvas,
+          {mips: true, premultipliedAlpha: true});
+  const dstTexturePremultipliedAlpha =
+      createTextureFromSource(
+          device, dstCanvas,
+          {mips: true, premultipliedAlpha: true});
+</pre>
+<p>注：シェーダーで事前乗算するオプションを追加することもできますが、それはあまり一般的ではありません。むしろ、ニーズに基づいて、色を含むすべてのテクスチャが事前乗算されているか、事前乗算されていないかを決定する方が一般的です。したがって、異なるテクスチャに固執し、事前乗算されたものまたは事前乗算されていないものを選択するためのUIオプションを追加します。</p>
+<p>2つの描画のそれぞれにユニフォームバッファが必要です。2つの異なる場所に描画したい場合や、テクスチャが2つの異なるサイズである場合に備えてです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  function makeUniformBufferAndValues(device) {
+    // float32インデックスでのさまざまなユニフォーム値へのオフセット
+    const kMatrixOffset = 0;
+
+    // ユニフォーム値用のバッファを作成します
+    const uniformBufferSize =
+      16 * 4; // 行列は16個の32ビット浮動小数点数（各4バイト）です
+    const buffer = device.createBuffer({
+      label: 'uniforms for quad',
+      size: uniformBufferSize,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+
+    // JavaScript側でユニフォームの値を保持するための型付き配列を作成します
+    const values = new Float32Array(uniformBufferSize / 4);
+    const matrix = values.subarray(kMatrixOffset, 16);
+    return { buffer, values, matrix };
+  }
+  const srcUniform = makeUniformBufferAndValues(device);
+  const dstUniform = makeUniformBufferAndValues(device);
+</pre>
+<p>サンプラーが必要であり、各テクスチャにバインドグループが必要です。これにより、問題が発生します。バインドグループにはバインドグループレイアウトが必要です。このサイトのほとんどの例では、<code class="notranslate" translate="no">somePipeline.getBindGroupLayout(groupNumber)</code>を呼び出すことによって、パイプラインからレイアウトを取得します。ただし、この場合、選択したブレンド状態設定に基づいてパイプラインを作成するため、レンダリング時まで、バインドグループレイアウトを取得するためのパイプラインはありません。</p>
+<p>レンダリング時にバインドグループを作成できます。または、独自のバインドグループレイアウトを作成し、パイプラインにそれを使用するように指示できます。これにより、初期化時にバインドグループを作成でき、同じバインドグループレイアウトを使用するどのパイプラインとも互換性があります。</p>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/API/GPUBindGroupLayout">bindGroupLayout</a>と<a href="https://developer.mozilla.org/en-US/docs/Web/API/GPUPipelineLayout">pipelineLayout</a>の作成の詳細については、<a href="webgpu-bind-group-layouts.html">別の記事</a>で説明します。今のところ、シェーダーモジュールに一致するそれらを作成するコードは次のとおりです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const bindGroupLayout = device.createBindGroupLayout({
+    entries: [
+      { binding: 0, visibility: GPUShaderStage.FRAGMENT, sampler: { }, },
+      { binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: { } },
+      { binding: 2, visibility: GPUShaderStage.VERTEX, buffer: { } },
+    ],
+  });
+
+  const pipelineLayout = device.createPipelineLayout({
+    bindGroupLayouts: [
+      bindGroupLayout,
+    ],
+  });
+</pre>
+<p>バインドグループレイアウトが作成されたので、それを使用してバインドグループを作成できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const sampler = device.createSampler({
+    magFilter: 'linear',
+    minFilter: 'linear',
+    mipmapFilter: 'linear',
+  });
+
+
+  const srcBindGroupUnpremultipliedAlpha = device.createBindGroup({
+    layout: bindGroupLayout,
+    entries: [
+      { binding: 0, resource: sampler },
+      { binding: 1, resource: srcTextureUnpremultipliedAlpha.createView() },
+      { binding: 2, resource: { buffer: srcUniform.buffer }},
+    ],
+  });
+
+  const dstBindGroupUnpremultipliedAlpha = device.createBindGroup({
+    layout: bindGroupLayout,
+    entries: [
+      { binding: 0, resource: sampler },
+      { binding: 1, resource: dstTextureUnpremultipliedAlpha.createView() },
+      { binding: 2, resource: { buffer: dstUniform.buffer }},
+    ],
+  });
+
+  const srcBindGroupPremultipliedAlpha = device.createBindGroup({
+    layout: bindGroupLayout,
+    entries: [
+      { binding: 0, resource: sampler },
+      { binding: 1, resource: srcTexturePremultipliedAlpha.createView() },
+      { binding: 2, resource: { buffer: srcUniform.buffer }},
+    ],
+  });
+
+  const dstBindGroupPremultipliedAlpha = device.createBindGroup({
+    layout: bindGroupLayout,
+    entries: [
+      { binding: 0, resource: sampler },
+      { binding: 1, resource: dstTexturePremultipliedAlpha.createView() },
+      { binding: 2, resource: { buffer: dstUniform.buffer }},
+    ],
+  });
+</pre>
+<p>バインドグループとテクスチャができたので、事前乗算されたテクスチャと事前乗算されていないテクスチャの配列を作成して、一方のセットまたは他方のセットを簡単に選択できるようにしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const textureSets = [
+    {
+      srcTexture: srcTexturePremultipliedAlpha,
+      dstTexture: dstTexturePremultipliedAlpha,
+      srcBindGroup: srcBindGroupPremultipliedAlpha,
+      dstBindGroup: dstBindGroupPremultipliedAlpha,
+    },
+    {
+      srcTexture: srcTextureUnpremultipliedAlpha,
+      dstTexture: dstTextureUnpremultipliedAlpha,
+      srcBindGroup: srcBindGroupUnpremultipliedAlpha,
+      dstBindGroup: dstBindGroupUnpremultipliedAlpha,
+    },
+  ];
+</pre>
+<p>レンダーパス記述子で、<code class="notranslate" translate="no">clearValue</code>を抽出して、より簡単にアクセスできるようにします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+  const clearValue = [0, 0, 0, 0];
+  const renderPassDescriptor = {
+    label: 'our basic canvas renderPass',
+    colorAttachments: [
+      {
+        // view: &lt;- レンダリング時に設定されます
+-        clearValue: [0.3, 0.3, 0.3, 1];
++        clearValue,
+        loadOp: 'clear',
+        storeOp: 'store',
+      },
+    ],
+  };
+</pre>
+<p>2つのレンダーパイプラインが必要です。1つは宛先テクスチャを描画するためのもので、これはブレンディングを使用しません。これまでのほとんどの例で行ってきたように、<code class="notranslate" translate="no">auto</code>を使用する代わりにパイプラインレイアウトを渡していることに注意してください。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const dstPipeline = device.createRenderPipeline({
+    label: 'hardcoded textured quad pipeline',
+    layout: pipelineLayout,
+    vertex: {
+      module,
+    },
+    fragment: {
+      module,
+      targets: [ { format: presentationFormat } ],
+    },
+  });
+</pre>
+<p>もう1つのパイプラインは、選択したブレンドオプションでレンダリング時に作成されます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const color = {
+    operation: 'add',
+    srcFactor: 'one',
+    dstFactor: 'one-minus-src',
+  };
+
+  const alpha = {
+    operation: 'add',
+    srcFactor: 'one',
+    dstFactor: 'one-minus-src',
+  };
+
+  function render() {
+    ...
+
+    const srcPipeline = device.createRenderPipeline({
+      label: 'hardcoded textured quad pipeline',
+      layout: pipelineLayout,
+      vertex: {
+        module,
+      },
+      fragment: {
+        module,
+        targets: [
+          {
+            format: presentationFormat,
+            blend: {
+              color,
+              alpha,
+            },
+          },
+        ],
+      },
+    });
+
+</pre>
+<p>レンダリングするには、テクスチャセットを選択し、dstPipeline（ブレンディングなし）でdstテクスチャをレンダリングし、その上にsrcPipeline（ブレンディングあり）でsrcテクスチャをレンダリングします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+  const settings = {
++    textureSet: 0,
++  };
+
+  function render() {
+    const srcPipeline = device.createRenderPipeline({
+      label: 'hardcoded textured quad pipeline',
+      layout: pipelineLayout,
+      vertex: {
+        module,
+      },
+      fragment: {
+        module,
+        targets: [
+          {
+            format: presentationFormat,
+            blend: {
+              color,
+              alpha,
+            },
+          },
+        ],
+      },
+    });
+
++    const {
++      srcTexture,
++      dstTexture,
++      srcBindGroup,
++      dstBindGroup,
++    } = textureSets[settings.textureSet];
+
+    const canvasTexture = context.getCurrentTexture();
+    // キャンバスコンテキストから現在のテクスチャを取得し、
+    // レンダリングするテクスチャとして設定します。
+    renderPassDescriptor.colorAttachments[0].view =
+        canvasTexture.createView();
+
++    function updateUniforms(uniform, canvasTexture, texture) {
++      const projectionMatrix = mat4.ortho(0, canvasTexture.width, canvasTexture.height, 0, -1, 1);
++
++      mat4.scale(projectionMatrix, [texture.width, texture.height, 1], uniform.matrix);
++
++      // JavaScriptからGPUに値をコピーします
++      device.queue.writeBuffer(uniform.buffer, 0, uniform.values);
++    }
++    updateUniforms(srcUniform, canvasTexture, srcTexture);
++    updateUniforms(dstUniform, canvasTexture, dstTexture);
+
+    const encoder = device.createCommandEncoder({ label: 'render with blending' });
+    const pass = encoder.beginRenderPass(renderPassDescriptor);
+
++    // dstを描画します
++    pass.setPipeline(dstPipeline);
++    pass.setBindGroup(0, dstBindGroup);
++    pass.draw(6);  // 頂点シェーダーを6回呼び出します
++
++    // srcを描画します
++    pass.setPipeline(srcPipeline);
++    pass.setBindGroup(0, srcBindGroup);
++    pass.draw(6);  // 頂点シェーダーを6回呼び出します
+
+    pass.end();
+
+    const commandBuffer = encoder.finish();
+    device.queue.submit([commandBuffer]);
+  }
+</pre>
+<p>次に、これらの値を設定するためのUIを作成しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+  const presets = {
++    'default (copy)': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one',
++        dstFactor: 'zero',
++      },
++    },
++    'premultiplied blend (source-over)': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'un-premultiplied blend': {
++      color: {
++        operation: 'add',
++        srcFactor: 'src-alpha',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'destination-over': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one-minus-dst-alpha',
++        dstFactor: 'one',
++      },
++    },
++    'source-in': {
++      color: {
++        operation: 'add',
++        srcFactor: 'dst-alpha',
++        dstFactor: 'zero',
++      },
++    },
++    'destination-in': {
++      color: {
++        operation: 'add',
++        srcFactor: 'zero',
++        dstFactor: 'src-alpha',
++      },
++    },
++    'source-out': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one-minus-dst-alpha',
++        dstFactor: 'zero',
++      },
++    },
++    'destination-out': {
++      color: {
++        operation: 'add',
++        srcFactor: 'zero',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'source-atop': {
++      color: {
++        operation: 'add',
++        srcFactor: 'dst-alpha',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'destination-atop': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one-minus-dst-alpha',
++        dstFactor: 'src-alpha',
++      },
++    },
++    'additive (lighten)': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one',
++        dstFactor: 'one',
++      },
++    },
++  };
+
+  ...
+
+  const settings = {
+    textureSet: 0,
++    preset: 'default (copy)',
+  };
+
+  const gui = new GUI().onChange(render);
+  gui.add(settings, 'textureSet', ['premultiplied alpha', 'un-premultiplied alpha']);
++  gui.add(settings, 'preset', Object.keys(presets))
++    .name('blending preset')
++    .onChange(presetName =&gt; {
++      const preset = presets[presetName];
++      Object.assign(color, preset.color);
++      Object.assign(alpha, preset.alpha || preset.color);
++      gui.updateDisplay();
++    });
+
+  ...
+</pre>
+<p><code class="notranslate" translate="no">operation</code>が<code class="notranslate" translate="no">'min'</code>または<code class="notranslate" translate="no">'max'</code>の場合、<code class="notranslate" translate="no">srcFactor</code>と<code class="notranslate" translate="no">dstFactor</code>を<code class="notranslate" translate="no">'one'</code>に設定しないと、エラーが発生します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+  function makeBlendComponentValid(blend) {
++    const { operation } = blend;
++    if (operation === 'min' || operation === 'max') {
++      blend.srcFactor = 'one';
++      blend.dstFactor = 'one';
++    }
++  }
+
+  function render() {
++    makeBlendComponentValid(color);
++    makeBlendComponentValid(alpha);
++    gui.updateDisplay();
+
+    ...
+</pre>
+<p>また、<code class="notranslate" translate="no">'constant'</code>または<code class="notranslate" translate="no">'one-minus-constant'</code>を係数として選択した場合に、ブレンド定数を設定できるようにしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+  const constant = {
++    color: [1, 0.5, 0.25],
++    alpha: 1,
++  };
+
+  const settings = {
+    textureSet: 0,
+  };
+
+  const gui = new GUI().onChange(render);
+  gui.add(settings, 'textureSet', ['premultiplied alpha', 'un-premultiplied alpha']);
+  ...
++  const constantFolder = gui.addFolder('constant');
++  constantFolder.addColor(constant, 'color');
++  constantFolder.add(constant, 'alpha', 0, 1);
+
+  ...
+
+  function render() {
+    ...
+
+    const pass = encoder.beginRenderPass(renderPassDescriptor);
+
+    // dstを描画します
+    pass.setPipeline(dstPipeline);
+    pass.setBindGroup(0, dstBindGroup);
+    pass.draw(6);  // 頂点シェーダーを6回呼び出します
+
+    // srcを描画します
+    pass.setPipeline(srcPipeline);
+    pass.setBindGroup(0, srcBindGroup);
++    pass.setBlendConstant([...constant.color, constant.alpha]);
+    pass.draw(6);  // 頂点シェーダーを6回呼び出します
+
+    pass.end();
+  }
+</pre>
+<p>13 * 13 * 5 * 13 * 13 * 5通りの設定があるため、探索するには多すぎるので、プリセットのリストを提供しましょう。<code class="notranslate" translate="no">alpha</code>設定がない場合は、<code class="notranslate" translate="no">color</code>設定を繰り返します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+  const presets = {
++    'default (copy)': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one',
++        dstFactor: 'zero',
++      },
++    },
++    'premultiplied blend (source-over)': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'un-premultiplied blend': {
++      color: {
++        operation: 'add',
++        srcFactor: 'src-alpha',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'destination-over': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one-minus-dst-alpha',
++        dstFactor: 'one',
++      },
++    },
++    'source-in': {
++      color: {
++        operation: 'add',
++        srcFactor: 'dst-alpha',
++        dstFactor: 'zero',
++      },
++    },
++    'destination-in': {
++      color: {
++        operation: 'add',
++        srcFactor: 'zero',
++        dstFactor: 'src-alpha',
++      },
++    },
++    'source-out': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one-minus-dst-alpha',
++        dstFactor: 'zero',
++      },
++    },
++    'destination-out': {
++      color: {
++        operation: 'add',
++        srcFactor: 'zero',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'source-atop': {
++      color: {
++        operation: 'add',
++        srcFactor: 'dst-alpha',
++        dstFactor: 'one-minus-src-alpha',
++      },
++    },
++    'destination-atop': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one-minus-dst-alpha',
++        dstFactor: 'src-alpha',
++      },
++    },
++    'additive (lighten)': {
++      color: {
++        operation: 'add',
++        srcFactor: 'one',
++        dstFactor: 'one',
++      },
++    },
++  };
+
+  ...
+
+  const settings = {
+    textureSet: 0,
++    preset: 'default (copy)',
+  };
+
+  const gui = new GUI().onChange(render);
+  gui.add(settings, 'textureSet', ['premultiplied alpha', 'un-premultiplied alpha']);
++  gui.add(settings, 'preset', Object.keys(presets))
++    .name('blending preset')
++    .onChange(presetName =&gt; {
++      const preset = presets[presetName];
++      Object.assign(color, preset.color);
++      Object.assign(alpha, preset.alpha || preset.color);
++      gui.updateDisplay();
++    });
+
+  ...
+</pre>
+<p>また、<code class="notranslate" translate="no">alphaMode</code>のキャンバス構成を選択できるようにしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const settings = {
++    alphaMode: 'premultiplied',
+    textureSet: 0,
+    preset: 'default (copy)',
+  };
+
+  const gui = new GUI().onChange(render);
++  gui.add(settings, 'alphaMode', ['opaque', 'premultiplied']).name('canvas alphaMode');
+  gui.add(settings, 'textureSet', ['premultiplied alpha', 'un-premultiplied alpha']);
+
+  ...
+
+  function render() {
+    ...
+
++    context.configure({
++      device,
++      format: presentationFormat,
++      alphaMode: settings.alphaMode,
++    });
+
+    const canvasTexture = context.getCurrentTexture();
+    // キャンバスコンテキストから現在のテクスチャを取得し、
+    // レンダリングするテクスチャとして設定します。
+    renderPassDescriptor.colorAttachments[0].view =
+        canvasTexture.createView();
+
+</pre>
+<p>そして最後に、レンダーパスのクリア値を選択できるようにしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+  const clear = {
++    color: [0, 0, 0],
++    alpha: 0,
++    premultiply: true,
++  };
+
+  const settings = {
+    alphaMode: 'premultiplied',
+    textureSet: 0,
+    preset: 'default (copy)',
+  };
+
+  const gui = new GUI().onChange(render);
+
+  ...
+
++  const clearFolder = gui.addFolder('clear color');
++  clearFolder.add(clear, 'premultiply');
++  clearFolder.add(clear, 'alpha', 0, 1);
++  clearFolder.addColor(clear, 'color');
+
+  function render() {
+    ...
+
+    const canvasTexture = context.getCurrentTexture();
+    // キャンバスコンテキストから現在のテクスチャを取得し、
+    // レンダリングするテクスチャとして設定します。
+    renderPassDescriptor.colorAttachments[0].view =
+        canvasTexture.createView();
+
++    {
++      const { alpha, color, premultiply } = clear;
++      const mult = premultiply ? alpha : 1;
++      clearValue[0] = color[0] * mult;
++      clearValue[1] = color[1] * mult;
++      clearValue[2] = color[2] * mult;
++      clearValue[3] = alpha;
++    }
+</pre>
+<p>たくさんのオプションがありました。多すぎたかもしれません😅。いずれにせよ、これでブレンド設定を試すことができる例ができました。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-blend.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-blend.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>元の画像が与えられた場合</p>
+<div class="webgpu_center">
+  <div data-diagram="original"></div>
+</div>
+<p>既知の便利なブレンド設定をいくつか紹介します。</p>
+<div class="webgpu_center">
+  <div data-diagram="blend-premultiplied blend (source-over)"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-destination-over"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-additive (lighten)"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-source-in"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-destination-in"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-source-out"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-destination-out"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-source-atop"></div>
+</div>
+<div class="webgpu_center">
+  <div data-diagram="blend-destination-atop"></div>
+</div>
+<hr>
+<p>これらのブレンド設定名は、Canvas 2Dの<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation"><code class="notranslate" translate="no">globalCompositeOperation</code></a>オプションからのものです。その仕様にはさらに多くのオプションがリストされていますが、残りのほとんどは、これらの基本的なブレンディング設定のみで実行できるよりも多くの数学を必要とするため、異なる解決策が必要です。</p>
+<p>WebGPUでのブレンディングのこれらの基本を理解したので、さまざまなテクニックを説明するときにそれらを参照できます。</p>
+
+    </div>
+    <div class="lesson-sidebar">
+        <select class="language">
+    <option value="/webgpu/lessons/webgpu-transparency.html">English
+    </option><option value="/webgpu/lessons/es/webgpu-transparency.html">Spanish
+    </option><option value="/webgpu/lessons/ja/webgpu-transparency.html" selected="">日本語
+    </option><option value="/webgpu/lessons/ko/webgpu-transparency.html">한국어
+    </option><option value="/webgpu/lessons/ru/webgpu-transparency.html">Русский
+    </option><option value="/webgpu/lessons/tr/webgpu-transparency.html">Türkçe
+    </option><option value="/webgpu/lessons/uk/webgpu-transparency.html">Українська
+    </option><option value="/webgpu/lessons/zh_cn/webgpu-transparency.html">简体中文
+</option></select>
+
+
+        <div id="toc">
+          <ul>  <li>基本</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-fundamentals.html">基本</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-inter-stage-variables.html">inter-stage変数</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-uniforms.html">ユニフォーム</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-storage-buffers.html">ストレージバッファ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-vertex-buffers.html">頂点バッファ</a></li>
+  <li>テクスチャ</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-textures.html">テクスチャ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-importing-textures.html">画像の読み込み</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-textures-external-video.html">ビデオの使用</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-cube-maps.html">キューブマップ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-storage-textures.html">ストレージテクスチャ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-multisampling.html">マルチサンプリング / MSAA</a></li>
+        </ul>
+<li><a href="/webgpu/lessons/ja/webgpu-constants.html">定数</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-memory-layout.html">構造体とメモリレイアウト</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-transparency.html">透明度とブレンディング</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-bind-group-layouts.html">バインドグループレイアウト</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-copying-data.html">データのコピー</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-limits-and-features.html">オプション機能と制限</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-timing.html">タイミングパフォーマンス</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-wgsl.html">WGSL</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-how-it-works.html">仕組み</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-compatibility-mode.html">互換モード</a></li>
+        </ul>
+  <li>3Dの数学</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-translation.html">平行移動</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-rotation.html">回転</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-scale.html">スケール</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-matrix-math.html">行列演算</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-orthographic-projection.html">正射影</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-perspective-projection.html">透視投影</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-cameras.html">カメラ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-matrix-stacks.html">行列スタック</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-scene-graphs.html">シーングラフ</a></li>
+        </ul>
+  <li>ライト</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-lighting-directional.html">指向性ライティング</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-lighting-point.html">点光源</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-lighting-spot.html">スポットライト</a></li>
+        </ul>
+  <li>テクニック</li>
+        <ul>
+            <li>2D</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-large-triangle-to-cover-clip-space.html">大きなクリップ空間の三角形</a></li>
+        </ul>
+  <li>3D</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-environment-maps.html">環境マップ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-skybox.html">スカイボックス</a></li>
+        </ul>
+  <li>ポストプロセッシング</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-post-processing.html">基本的なCRTエフェクト</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-image-adjustments.html">Image Adjustments</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-1dlut.html">1D Lookup Table (LUT)</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-3dlut.html">3D Lookup Table (LUT)</a></li>
+        </ul>
+        </ul>
+  <li>コンピュートシェーダ</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-compute-shaders.html">コンピュートシェーダーの基本</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-compute-shaders-histogram.html">画像ヒストグラム</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-compute-shaders-histogram-part-2.html">画像ヒストグラム パート2</a></li>
+        </ul>
+  <li>その他のトピック</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-resizing-the-canvas.html">Resizing the Canvas</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-multiple-canvases.html">複数のキャンバス</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-points.html">ポイント</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-from-webgl.html">WebGLからWebGPUへ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-optimization.html">速度と最適化</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-debugging.html">デバッグとエラー</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-resources.html">リソース / 参考文献</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-wgsl-function-reference.html">WGSL 関数リファレンス</a></li>
+<li><a href="/webgpu/lessons/resources/wgsl-offset-computer.html">WGSL オフセット計算機</a></li>
+        </ul></ul>
+<ul>
+  <li><a href="https://github.com/webgpu/webgpufundamentals">github</a></li>
+  <li><a href="https://google.github.io/tour-of-wgsl/">Tour of WGSL</a></li>
+  <li><a href="https://gpuweb.github.io/types/">WebGPU API Reference</a></li>
+  <li><a href="https://www.w3.org/TR/webgpu/">WebGPU Spec</a></li>
+  <li><a href="https://www.w3.org/TR/WGSL/">WGSL Spec</a></li>
+  <li><a href="https://webgpureport.org">WebGPUReport.org</a></li>
+  <li><a href="https://web3dsurvey.com/webgpu">Web3DSurvey.com</a></li>
+</ul>
+        </div>
+    </div>
+    <div class="lesson-comments">
+        <div>問題点/バグ? <a href="https://github.com/webgpu/webgpufundamentals/issues">githubでissueを作成</a>.</div>
+
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_config = function () {
+              this.page.url = `${window.location.origin}${window.location.pathname}`;
+              this.page.identifier = `WebGPUの透明度とブレンディング`;
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+                if (window.location.hostname.indexOf("webgpufundamentals.org") < 0) {
+                    return;
+                }
+                var d = document, s = d.createElement('script');
+                s.src = 'https://webgpufundamentals-org.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+  </div>
+</div>
+
+<script>
+const settings = {
+  contribTemplate: "Thank you <a href=\"${html_url}\"><img src=\"${avatar_url}\"> ${login}</a><br>for <a href=\"https://github.com/${owner}/${repo}/commits?author=${login}\">${contributions} contributions</a>",
+  owner: "gfxfundamentals",
+  repo: "webgpufundamentals",
+};
+</script>
+<script src="/contributors.js"></script>
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+<script src="/3rdparty/jquery-3.3.1.slim.min.js"></script>
+<script src="/webgpu/lessons/resources/js/prettify.js"></script>
+<script src="/webgpu/lessons/resources/js/lesson.js" type="module"></script>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-92BFT5PE4H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-92BFT5PE4H');
+</script>
+
+
+
+
+
+
+</body></html>

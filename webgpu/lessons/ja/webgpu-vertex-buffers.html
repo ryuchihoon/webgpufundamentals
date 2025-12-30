@@ -1,0 +1,1247 @@
+<!DOCTYPE html><!-- this file is auto-generated from webgpu/lessons/ja/webgpu-vertex-buffers.md. Do not edited directly --><!--
+Copyright 2023, GfxFundamentals Contributors
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+* Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
+  distribution.
+
+* Neither the name of GfxFundamentals nor the names of the
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--><html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="シェーダーへの頂点データの受け渡し">
+<meta name="keywords" content="webgpu graphics">
+<meta name="thumbnail" content="https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-vertex-buffers_ja.jpg">
+
+<meta property="og:title" content="WebGPU 頂点バッファ">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-vertex-buffers_ja.jpg">
+<meta property="og:description" content="シェーダーへの頂点データの受け渡し">
+<meta property="og:url" content="https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-vertex-buffers.html">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@greggman">
+<meta name="twitter:creator" content="@greggman">
+<meta name="twitter:domain" content="webgpufundamentals.org">
+<meta name="twitter:title" content="WebGPU 頂点バッファ">
+<meta name="twitter:url" content="https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-vertex-buffers.html">
+<meta name="twitter:description" content="シェーダーへの頂点データの受け渡し">
+<meta name="twitter:image:src" content="https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-vertex-buffers_ja.jpg">
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {
+      "@type":"WebSite",
+      "@id":"https://webgpufundamentals.org/#website",
+      "url":"https://webgpufundamentals.org/",
+      "name":"webgpufundamentals"
+    },
+    {
+      "@type":"ImageObject",
+      "@id":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-vertex-buffers.html#primaryimage",
+      "url":"https://webgpufundamentals.org/webgpu/lessons/screenshots/webgpu-vertex-buffers_ja.jpg",
+      "width":1200,
+      "height":630
+    },
+    {
+      "@type":"WebPage",
+      "@id":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-vertex-buffers.html#webpage",
+      "url":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-vertex-buffers.html",
+      "inLanguage":"ja",
+      "name":"WebGPU 頂点バッファ",
+      "keywords":"webgpu graphics programming",
+      "isPartOf":{
+        "@id":"https://webgpufundamentals.org/#website"
+      },
+      "primaryImageOfPage":{
+        "@id":"https://webgpufundamentals.org/webgpu/lessons/ja/webgpu-vertex-buffers.html#primaryimage"
+      }
+    }
+  ]
+}
+</script>
+
+<title>WebGPU 頂点バッファ</title>
+<link href="/webgpu/lessons/resources/webgpufundamentals-icon.png" rel="shortcut icon" type="image/png">
+<link rel="apple-touch-icon" href="/webgpu/lessons/resources/webgpufundamentals-icon.png">
+<link rel="icon" href="/webgpu/lessons/resources/webgpufundamentals-icon.png">
+
+<link rel="stylesheet" href="/webgpu/lessons/lang.css">
+<link rel="stylesheet" href="/webgpu/lessons/resources/lesson.css">
+</head>
+<body>
+<div class="webgpu_navbar">
+  <div>
+    <select class="language">
+    <option value="/webgpu/lessons/webgpu-vertex-buffers.html">English
+    </option><option value="/webgpu/lessons/es/webgpu-vertex-buffers.html">Spanish
+    </option><option value="/webgpu/lessons/ja/webgpu-vertex-buffers.html" selected="">日本語
+    </option><option value="/webgpu/lessons/ko/webgpu-vertex-buffers.html">한국어
+    </option><option value="/webgpu/lessons/ru/webgpu-vertex-buffers.html">Русский
+    </option><option value="/webgpu/lessons/tr/webgpu-vertex-buffers.html">Türkçe
+    </option><option value="/webgpu/lessons/uk/webgpu-vertex-buffers.html">Українська
+    </option><option value="/webgpu/lessons/zh_cn/webgpu-vertex-buffers.html">简体中文
+</option></select>
+
+
+    <a href="#toc">目次</a>
+    <input type="search" placeholder="?" id="search">
+  </div>
+</div>
+<div class="webgpu_header">
+  <h1><a href="/webgpu/lessons/ja/">webgpufundamentals.org</a></h1>
+<style>
+#forkongithub>div {
+    background: #000;
+    color: #fff;
+    font-family: arial,sans-serif;
+    text-align: center;
+    font-weight: bold;
+    padding: 5px 40px;
+    font-size: 0.9rem;
+    line-height: 1.3rem;
+    position: relative;
+    transition: 0.5s;
+    display: block;
+    width: 400px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translateX(160px) rotate(45deg) translate(10px,70px);
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.8);
+    pointer-events: auto;
+}
+#forkongithub a {
+  text-decoration: none;
+  color: #fff;
+}
+#forkongithub>div:hover {
+    background: #c11;
+    color: #fff;
+}
+#forkongithub .contributors {
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.2);
+  line-height: 1.2;
+  padding: 0.1em;
+}
+#forkongithub>div::before,#forkongithub>div::after {
+    content: "";
+    width: 100%;
+    display: block;
+    position: absolute;
+    top: 1px;
+    left: 0;
+    height: 1px;
+    background: #fff;
+}
+#forkongithub>div::after {
+    bottom: 1px;
+    top: auto;
+}
+
+#forkongithub{
+    z-index: 9999;
+    /* needed for firefox */
+    overflow: hidden;
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    pointer-events: none;
+}
+#forkongithub svg{
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+#forkongithub img {
+  width: 1em;
+  height: 1em;
+  border-radius: 100%;
+  vertical-align: middle;
+}
+
+@media (max-width: 900px) {
+    #forkongithub>div {
+        line-height: 1.2rem;
+    }
+}
+@media (max-width: 700px) {
+  #forkongithub {
+    display: none;
+  }
+}
+@media (max-width: 410px) {
+    #forkongithub>div {
+        font-size: 0.7rem;
+        transform: translateX(150px) rotate(45deg) translate(20px,40px);
+    }
+}
+
+</style>
+<div id="forkongithub">
+  <div>
+    <div><a href="https://github.com/webgpu/webgpufundamentals">Fix, Fork, Contribute <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+
+<svg width="100%" height="100%" viewBox="0 0 136 133" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(3.92891,0,0,3.92891,67.867,129.125)">
+        <path d="M0,-31.904C-8.995,-31.904 -16.288,-24.611 -16.288,-15.614C-16.288,-8.417 -11.621,-2.312 -5.148,-0.157C-4.333,-0.008 -4.036,-0.511 -4.036,-0.943C-4.036,-1.329 -4.05,-2.354 -4.058,-3.713C-8.589,-2.729 -9.545,-5.897 -9.545,-5.897C-10.286,-7.779 -11.354,-8.28 -11.354,-8.28C-12.833,-9.29 -11.242,-9.27 -11.242,-9.27C-9.607,-9.155 -8.747,-7.591 -8.747,-7.591C-7.294,-5.102 -4.934,-5.821 -4.006,-6.238C-3.858,-7.29 -3.438,-8.008 -2.972,-8.415C-6.589,-8.826 -10.392,-10.224 -10.392,-16.466C-10.392,-18.244 -9.757,-19.698 -8.715,-20.837C-8.883,-21.249 -9.442,-22.905 -8.556,-25.148C-8.556,-25.148 -7.188,-25.586 -4.076,-23.478C-2.777,-23.84 -1.383,-24.02 0.002,-24.026C1.385,-24.02 2.779,-23.84 4.08,-23.478C7.19,-25.586 8.555,-25.148 8.555,-25.148C9.444,-22.905 8.885,-21.249 8.717,-20.837C9.761,-19.698 10.392,-18.244 10.392,-16.466C10.392,-10.208 6.583,-8.831 2.954,-8.428C3.539,-7.925 4.06,-6.931 4.06,-5.411C4.06,-3.234 4.04,-1.477 4.04,-0.943C4.04,-0.507 4.333,0 5.16,-0.159C11.628,-2.318 16.291,-8.419 16.291,-15.614C16.291,-24.611 8.997,-31.904 0,-31.904" style="fill:white;"></path>
+    </g>
+</svg>
+</a></div>
+  </div>
+</div>
+
+</div>
+
+
+<div class="container">
+  <div class="lesson-title">
+    <h1>WebGPU 頂点バッファ</h1>
+  </div>
+  <div class="lesson">
+    <div class="lesson-main">
+      <div class="warn">この記事はGemini Code Assistによって自動翻訳されました。翻訳に問題がある場合は、お手数ですが<a href="https://github.com/webgpu/webgpufundamentals/pulls">こちら</a>からPull Requestを送信してください。</div>
+<p><a href="webgpu-storage-buffers.html">前の記事</a>では、頂点データをストレージバッファに入れ、組み込みの<code class="notranslate" translate="no">vertex_index</code>を使用してインデックス付けしました。その手法は人気が高まっていますが、頂点シェーダーに頂点データを提供するための従来の方法は、頂点バッファと属性を使用することです。</p>
+<p>頂点バッファは、他のWebGPUバッファと同様に、データを保持します。違いは、頂点シェーダーから直接アクセスしないことです。代わりに、WebGPUにバッファ内のデータの種類と編成方法を伝え、データをバッファから取り出して提供してもらいます。</p>
+<p><a href="webgpu-storage-buffers.html">前の記事</a>の最後の例を取り上げ、ストレージバッファの使用から頂点バッファの使用に変更しましょう。</p>
+<p>最初に行うことは、シェーダーを変更して、頂点データを頂点バッファから取得するようにすることです。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">struct OurStruct {
+  color: vec4f,
+  offset: vec2f,
+};
+
+struct OtherStruct {
+  scale: vec2f,
+};
+
+struct Vertex {
+-  position: vec2f,
++  @location(0) position: vec2f,
+};
+
+struct VSOutput {
+  @builtin(position) position: vec4f,
+  @location(0) color: vec4f,
+};
+
+@group(0) @binding(0) var&lt;storage, read&gt; ourStructs: array&lt;OurStruct&gt;;
+@group(0) @binding(1) var&lt;storage, read&gt; otherStructs: array&lt;OtherStruct&gt;;
+-@group(0) @binding(2) var&lt;storage, read&gt; pos: array&lt;Vertex&gt;;
+
+@vertex fn vs(
+-  @builtin(vertex_index) vertexIndex : u32,
++  vert: Vertex,
+  @builtin(instance_index) instanceIndex: u32
+) -&gt; VSOutput {
+  let otherStruct = otherStructs[instanceIndex];
+  let ourStruct = ourStructs[instanceIndex];
+
+  var vsOut: VSOutput;
+  vsOut.position = vec4f(
+-      pos[vertexIndex].position * otherStruct.scale + ourStruct.offset, 0.0, 1.0);
++      vert.position * otherStruct.scale + ourStruct.offset, 0.0, 1.0);
+  vsOut.color = ourStruct.color;
+  return vsOut;
+}
+
+...
+</pre>
+<p>ご覧のとおり、これは小さな変更です。重要な部分は、<code class="notranslate" translate="no">@location(0)</code>で位置フィールドを宣言することです。</p>
+<p>次に、<code class="notranslate" translate="no">@location(0)</code>のデータを供給する方法をWebGPUに伝える必要があります。そのためには、レンダーパイプラインを使用します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const pipeline = device.createRenderPipeline({
+    label: 'vertex buffer pipeline',
+    layout: 'auto',
+    vertex: {
+      module,
++      buffers: [
++        {
++          arrayStride: 2 * 4, // 2 floats, 4 bytes each
++          attributes: [
++            {shaderLocation: 0, offset: 0, format: 'float32x2'},  // position
++          ],
++        },
++      ],
+    },
+    fragment: {
+      module,
+      targets: [{ format: presentationFormat }],
+    },
+  });
+</pre>
+<p><a href="https://www.w3.org/TR/webgpu/#dictdef-gpurenderpipelinedescriptor"><code class="notranslate" translate="no">pipeline</code>記述子</a>の<a href="https://www.w3.org/TR/webgpu/#dictdef-gpuvertexstate"><code class="notranslate" translate="no">vertex</code></a>エントリに、1つ以上の頂点バッファからデータを取得する方法を記述するために使用される<code class="notranslate" translate="no">buffers</code>配列を追加しました。最初の、そして唯一のバッファについて、バイト単位で<code class="notranslate" translate="no">arrayStride</code>を設定しました。この場合の<em>ストライド</em>は、バッファ内の1つの頂点のデータから、バッファ内の次の頂点のデータに進むために取得するバイト数です。</p>
+<div class="webgpu_center"><img src="../resources/vertex-buffer-one.svg" style="width: 1024px;"></div>
+<p>データは<code class="notranslate" translate="no">vec2f</code>であり、2つのfloat32数値なので、<code class="notranslate" translate="no">arrayStride</code>を8に設定しました。</p>
+<p>次に、属性の配列を定義します。1つしかありません。<code class="notranslate" translate="no">shaderLocation: 0</code>は、<code class="notranslate" translate="no">Vertex</code>構造体の<code class="notranslate" translate="no">location(0)</code>に対応します。<code class="notranslate" translate="no">offset: 0</code>は、この属性のデータが頂点バッファのバイト0から始まることを示します。最後に、<code class="notranslate" translate="no">format: 'float32x2'</code>は、WebGPUにバッファからデータを2つの32ビット浮動小数点数として取得するように指示します。（注：<code class="notranslate" translate="no">attributes</code>プロパティは、最初の記事の<a href="webgpu-fundamentals.html#a-draw-diagram">単純化された描画図</a>に示されています）。</p>
+<p>頂点データを保持するバッファの使用法を<code class="notranslate" translate="no">STORAGE</code>から<code class="notranslate" translate="no">VERTEX</code>に変更し、バインドグループから削除する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  const vertexStorageBuffer = device.createBuffer({
+-    label: 'storage buffer vertices',
+-    size: vertexData.byteLength,
+-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+-  });
++  const vertexBuffer = device.createBuffer({
++    label: 'vertex buffer vertices',
++    size: vertexData.byteLength,
++    usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
++  });
++  device.queue.writeBuffer(vertexBuffer, 0, vertexData);
+
+  const bindGroup = device.createBindGroup({
+    label: 'bind group for objects',
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: { buffer: staticStorageBuffer }},
+      { binding: 1, resource: { buffer: changingStorageBuffer }},
+-      { binding: 2, resource: { buffer: vertexStorageBuffer }},
+    ],
+  });
+</pre>
+<p>次に、描画時に、使用する頂点バッファをWebGPUに伝える必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    pass.setPipeline(pipeline);
++    pass.setVertexBuffer(0, vertexBuffer);
+</pre>
+<p>ここでの<code class="notranslate" translate="no">0</code>は、上記で指定したレンダーパイプライン<code class="notranslate" translate="no">buffers</code>配列の最初の要素に対応します。</p>
+<p>これで、頂点にストレージバッファを使用する代わりに、頂点バッファを使用するように切り替えました。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-vertex-buffers.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-vertex-buffers.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>描画コマンドが実行されるときの状態は、次のようになります。</p>
+<div class="webgpu_center"><img src="../resources/webgpu-draw-diagram-vertex-buffer.svg" style="width: 960px;"></div>
+<p>属性<code class="notranslate" translate="no">format</code>フィールドは、次のいずれかの型になります。</p>
+<div class="webgpu_center data-table">
+  <style>
+    .vertex-type {
+      text-align: center;
+    }
+  </style>
+  <div>
+  <table class="vertex-type">
+    <thead>
+     <tr>
+      <th>頂点形式</th>
+      <th>データ型</th>
+      <th>コンポーネント</th>
+      <th>バイトサイズ</th>
+      <th>WGSL型の例</th>
+     </tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="notranslate" translate="no">"uint8x2"</code></td><td>符号なし整数</td><td>2</td><td>2</td><td><code class="notranslate" translate="no">vec2&lt;u32&gt;</code>, <code class="notranslate" translate="no">vec2u</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"uint8x4"</code></td><td>符号なし整数</td><td>4</td><td>4</td><td><code class="notranslate" translate="no">vec4&lt;u32&gt;</code>, <code class="notranslate" translate="no">vec4u</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint8x2"</code></td><td>符号付き整数</td><td>2</td><td>2</td><td><code class="notranslate" translate="no">vec2&lt;i32&gt;</code>, <code class="notranslate" translate="no">vec2i</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint8x4"</code></td><td>符号付き整数</td><td>4</td><td>4</td><td><code class="notranslate" translate="no">vec4&lt;i32&gt;</code>, <code class="notranslate" translate="no">vec4i</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"unorm8x2"</code></td><td>符号なし正規化</td><td>2</td><td>2</td><td><code class="notranslate" translate="no">vec2&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec2f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"unorm8x4"</code></td><td>符号なし正規化</td><td>4</td><td>4</td><td><code class="notranslate" translate="no">vec4&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec4f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"snorm8x2"</code></td><td>符号付き正規化</td><td>2</td><td>2</td><td><code class="notranslate" translate="no">vec2&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec2f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"snorm8x4"</code></td><td>符号付き正規化</td><td>4</td><td>4</td><td><code class="notranslate" translate="no">vec4&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec4f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"uint16x2"</code></td><td>符号なし整数</td><td>2</td><td>4</td><td><code class="notranslate" translate="no">vec2&lt;u32&gt;</code>, <code class="notranslate" translate="no">vec2u</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"uint16x4"</code></td><td>符号なし整数</td><td>4</td><td>8</td><td><code class="notranslate" translate="no">vec4&lt;u32&gt;</code>, <code class="notranslate" translate="no">vec4u</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint16x2"</code></td><td>符号付き整数</td><td>2</td><td>4</td><td><code class="notranslate" translate="no">vec2&lt;i32&gt;</code>, <code class="notranslate" translate="no">vec2i</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint16x4"</code></td><td>符号付き整数</td><td>4</td><td>8</td><td><code class="notranslate" translate="no">vec4&lt;i32&gt;</code>, <code class="notranslate" translate="no">vec4i</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"unorm16x2"</code></td><td>符号なし正規化</td><td>2</td><td>4</td><td><code class="notranslate" translate="no">vec2&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec2f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"unorm16x4"</code></td><td>符号なし正規化</td><td>4</td><td>8</td><td><code class="notranslate" translate="no">vec4&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec4f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"snorm16x2"</code></td><td>符号付き正規化</td><td>2</td><td>4</td><td><code class="notranslate" translate="no">vec2&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec2f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"snorm16x4"</code></td><td>符号付き正規化</td><td>4</td><td>8</td><td><code class="notranslate" translate="no">vec4&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec4f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"float16x2"</code></td><td>浮動小数点数</td><td>2</td><td>4</td><td><code class="notranslate" translate="no">vec2&lt;f16&gt;</code>, <code class="notranslate" translate="no">vec2h</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"float16x4"</code></td><td>浮動小数点数</td><td>4</td><td>8</td><td><code class="notranslate" translate="no">vec4&lt;f16&gt;</code>, <code class="notranslate" translate="no">vec4h</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"float32"</code></td><td>浮動小数点数</td><td>1</td><td>4</td><td><code class="notranslate" translate="no">f32</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"float32x2"</code></td><td>浮動小数点数</td><td>2</td><td>8</td><td><code class="notranslate" translate="no">vec2&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec2f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"float32x3"</code></td><td>浮動小数点数</td><td>3</td><td>12</td><td><code class="notranslate" translate="no">vec3&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec3f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"float32x4"</code></td><td>浮動小数点数</td><td>4</td><td>16</td><td><code class="notranslate" translate="no">vec4&lt;f32&gt;</code>, <code class="notranslate" translate="no">vec4f</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"uint32"</code></td><td>符号なし整数</td><td>1</td><td>4</td><td><code class="notranslate" translate="no">u32</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"uint32x2"</code></td><td>符号なし整数</td><td>2</td><td>8</td><td><code class="notranslate" translate="no">vec2&lt;u32&gt;</code>, <code class="notranslate" translate="no">vec2u</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"uint32x3"</code></td><td>符号なし整数</td><td>3</td><td>12</td><td><code class="notranslate" translate="no">vec3&lt;u32&gt;</code>, <code class="notranslate" translate="no">vec3u</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"uint32x4"</code></td><td>符号なし整数</td><td>4</td><td>16</td><td><code class="notranslate" translate="no">vec4&lt;u32&gt;</code>, <code class="notranslate" translate="no">vec4u</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint32"</code></td><td>符号付き整数</td><td>1</td><td>4</td><td><code class="notranslate" translate="no">i32</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint32x2"</code></td><td>符号付き整数</td><td>2</td><td>8</td><td><code class="notranslate" translate="no">vec2&lt;i32&gt;</code>, <code class="notranslate" translate="no">vec2i</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint32x3"</code></td><td>符号付き整数</td><td>3</td><td>12</td><td><code class="notranslate" translate="no">vec3&lt;i32&gt;</code>, <code class="notranslate" translate="no">vec3i</code></td></tr>
+      <tr><td><code class="notranslate" translate="no">"sint32x4"</code></td><td>符号付き整数</td><td>4</td><td>16</td><td><code class="notranslate" translate="no">vec4&lt;i32&gt;</code>, <code class="notranslate" translate="no">vec4i</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+<h2 id="頂点バッファを使用したインスタンス化"><a id="a-instancing"></a>頂点バッファを使用したインスタンス化</h2>
+<p>属性は、頂点ごとまたはインスタンスごとに進めることができます。インスタンスごとに進めることは、<code class="notranslate" translate="no">instanceIndex</code>が<code class="notranslate" translate="no">@builtin(instance_index)</code>から値を取得する<code class="notranslate" translate="no">otherStructs[instanceIndex]</code>と<code class="notranslate" translate="no">ourStructs[instanceIndex]</code>をインデックス付けするときに行っていることと事実上同じです。</p>
+<p>ストレージバッファを削除し、頂点バッファを使用して同じことを実現しましょう。まず、シェーダーを変更して、ストレージバッファの代わりに頂点属性を使用するようにします。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">-struct OurStruct {
+-  color: vec4f,
+-  offset: vec2f,
+-};
+-
+-struct OtherStruct {
+-  scale: vec2f,
+-};
+
+struct Vertex {
+  @location(0) position: vec2f,
++  @location(1) color: vec4f,
++  @location(2) offset: vec2f,
++  @location(3) scale: vec2f,
+};
+
+struct VSOutput {
+  @builtin(position) position: vec4f,
+  @location(0) color: vec4f,
+};
+
+-@group(0) @binding(0) var&lt;storage, read&gt; ourStructs: array&lt;OurStruct&gt;;
+-@group(0) @binding(1) var&lt;storage, read&gt; otherStructs: array&lt;OtherStruct&gt;;
+
+@vertex fn vs(
+  vert: Vertex,
+-  @builtin(instance_index) instanceIndex: u32
+) -&gt; VSOutput {
+-  let otherStruct = otherStructs[instanceIndex];
+-  let ourStruct = ourStructs[instanceIndex];
+
+  var vsOut: VSOutput;
+-  vsOut.position = vec4f(
+-      vert.position * otherStruct.scale + ourStruct.offset, 0.0, 1.0);
+-  vsOut.color = ourStruct.color;
++  vsOut.position = vec4f(
++      vert.position * vert.scale + vert.offset, 0.0, 1.0);
++  vsOut.color = vert.color;
+  return vsOut;
+}
+
+@fragment fn fs(vsOut: VSOutput) -&gt; @location(0) vec4f {
+  return vsOut.color;
+}
+</pre>
+<p>次に、レンダーパイプラインを更新して、それらの属性にデータを供給する方法を伝える必要があります。変更を最小限に抑えるために、ストレージバッファ用に作成したデータをほぼそのまま使用します。2つのバッファを使用します。1つのバッファはインスタンスごとの<code class="notranslate" translate="no">color</code>と<code class="notranslate" translate="no">offset</code>を保持し、もう1つは<code class="notranslate" translate="no">scale</code>を保持します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const pipeline = device.createRenderPipeline({
+    label: 'flat colors',
+    layout: 'auto',
+    vertex: {
+      module,
+      buffers: [
+        {
+          arrayStride: 2 * 4, // 2 floats, 4 bytes each
+          attributes: [
+            {shaderLocation: 0, offset: 0, format: 'float32x2'},  // position
+          ],
+        },
++        {
++          arrayStride: 6 * 4, // 6 floats, 4 bytes each
++          stepMode: 'instance',
++          attributes: [
++            {shaderLocation: 1, offset:  0, format: 'float32x4'},  // color
++            {shaderLocation: 2, offset: 16, format: 'float32x2'},  // offset
++          ],
++        },
++        {
++          arrayStride: 2 * 4, // 2 floats, 4 bytes each
++          stepMode: 'instance',
++          attributes: [
++            {shaderLocation: 3, offset: 0, format: 'float32x2'},   // scale
++          ],
++        },
+      ],
+    },
+    fragment: {
+      module,
+      targets: [{ format: presentationFormat }],
+    },
+  });
+</pre>
+<p>上記では、パイプライン記述の<code class="notranslate" translate="no">buffers</code>配列に2つのエントリを追加したので、これで3つのバッファエントリになり、3つのバッファでデータを供給することをWebGPUに伝えています。</p>
+<p>2つの新しいエントリについて、<code class="notranslate" translate="no">stepMode</code>を<code class="notranslate" translate="no">instance</code>に設定しました。これは、この属性がインスタンスごとに1回だけ次の値に進むことを意味します。デフォルトは<code class="notranslate" translate="no">stepMode: 'vertex'</code>で、頂点ごとに1回進みます（そして、各インスタンスで最初からやり直します）。</p>
+<p>2つのバッファがあります。<code class="notranslate" translate="no">scale</code>のみを保持するものは単純です。<code class="notranslate" translate="no">position</code>を保持する最初のバッファと同様に、頂点ごとに2つの32ビット浮動小数点数です。</p>
+<p>もう1つのバッファは<code class="notranslate" translate="no">color</code>と<code class="notranslate" translate="no">offset</code>を保持し、次のようにデータにインターリーブされます。</p>
+<div class="webgpu_center"><img src="../resources/vertex-buffer-f32x4-f32x2.svg" style="width: 1024px;"></div>
+<p>したがって、上記では、あるデータセットから次のデータセットに進むための<code class="notranslate" translate="no">arrayStride</code>を<code class="notranslate" translate="no">6 * 4</code>、つまり6つの32ビット浮動小数点数（それぞれ4バイト、合計24バイト）に設定しました。<code class="notranslate" translate="no">color</code>はオフセット0から始まりますが、<code class="notranslate" translate="no">offset</code>は16バイトから始まります。</p>
+<p>次に、バッファを設定するコードを変更できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  // 2つの頂点バッファを作成します
+  const staticUnitSize =
+-    4 * 4 + // colorは4つの32ビット浮動小数点数（各4バイト）です
+-    2 * 4 + // offsetは2つの32ビット浮動小数点数（各4バイト）です
+-    2 * 4;  // パディング
++    4;     // colorは4バイトです
+  const changingUnitSize =
+-    2 * 4;  // scaleは2つの32ビット浮動小数点数（各4バイト）です
++    2 * 4 + // offsetは2つの32ビット浮動小数点数（各4バイト）です
++    2 * 4;  // scaleは2つの32ビット浮動小数点数（各4バイト）です
+*  const staticVertexBufferSize = staticUnitSize * kNumObjects;
+*  const changingVertexBufferSize = changingUnitSize * kNumObjects;
+
+*  const staticVertexBuffer = device.createBuffer({
+*    label: 'static vertex for objects',
+*    size: staticVertexBufferSize,
+-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
++    usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+  });
+
+*  const changingVertexBuffer = device.createBuffer({
+*    label: 'changing vertex for objects',
+*    size: changingVertexBufferSize,
+-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
++    usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+  });
+
+</pre>
+<p>頂点属性には、ストレージバッファの構造体と同じパディング制限がないため、パディングはもう必要ありません。それ以外は、使用法を<code class="notranslate" translate="no">STORAGE</code>から<code class="notranslate" translate="no">VERTEX</code>に変更しただけです（そして、すべての変数を「ストレージ」から「頂点」に名前変更しました）。</p>
+<p>ストレージバッファを使用しなくなったため、バインドグループはもう必要ありません。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  const bindGroup = device.createBindGroup({
+-    label: 'bind group for objects',
+-    layout: pipeline.getBindGroupLayout(0),
+-    entries: [
+-      { binding: 0, resource: { buffer: staticStorageBuffer }},
+-      { binding: 1, resource: { buffer: changingStorageBuffer }},
+-    ],
+-  });
+</pre>
+<p>最後に、バインドグループを設定する必要はありませんが、頂点バッファを設定する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    const encoder = device.createCommandEncoder();
+    const pass = encoder.beginRenderPass(renderPassDescriptor);
+    pass.setPipeline(pipeline);
+    pass.setVertexBuffer(0, vertexBuffer);
++    pass.setVertexBuffer(1, staticVertexBuffer);
++    pass.setVertexBuffer(2, changingVertexBuffer);
+
+    ...
+-    pass.setBindGroup(0, bindGroup);
+    pass.draw(numVertices, kNumObjects);
+
+    pass.end();
+</pre>
+<p>ここでの<code class="notranslate" translate="no">setVertexBuffer</code>の最初のパラメータは、上記で作成したパイプラインの<code class="notranslate" translate="no">buffers</code>配列の要素に対応します。</p>
+<p>これで、以前と同じものができましたが、すべての頂点バッファを使用し、ストレージバッファは使用していません。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-vertex-buffers-instanced-colors"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-vertex-buffers-instanced-colors" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>楽しみのために、頂点ごとに色を付ける属性を追加しましょう。まず、シェーダーを変更しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">struct Vertex {
+  @location(0) position: vec2f,
+  @location(1) color: vec4f,
+  @location(2) offset: vec2f,
+  @location(3) scale: vec2f,
++  @location(4) perVertexColor: vec3f,
+};
+
+struct VSOutput {
+  @builtin(position) position: vec4f,
+  @location(0) color: vec4f,
+};
+
+@vertex fn vs(
+  vert: Vertex,
+) -&gt; VSOutput {
+  var vsOut: VSOutput;
+  vsOut.position = vec4f(
+      vert.position * vert.scale + vert.offset, 0.0, 1.0);
+-  vsOut.color = vert.color;
++  vsOut.color = vert.color * vec4f(vert.perVertexColor, 1);
+  return vsOut;
+}
+
+@fragment fn fs(vsOut: VSOutput) -&gt; @location(0) vec4f {
+  return vsOut.color;
+}
+</pre>
+<p>次に、データを供給する方法を記述するためにパイプラインを更新する必要があります。<code class="notranslate" translate="no">perVertexColor</code>データを<code class="notranslate" translate="no">position</code>と次のようにインターリーブします。</p>
+<div class="webgpu_center"><img src="../resources/vertex-buffer-mixed.svg" style="width: 1024px;"></div>
+<p>したがって、<code class="notranslate" translate="no">arrayStride</code>を新しいデータをカバーするように変更し、新しい属性を追加する必要があります。2つの32ビット浮動小数点数の後に始まるため、バッファへの<code class="notranslate" translate="no">offset</code>は8バイトです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const pipeline = device.createRenderPipeline({
+    label: 'per vertex color',
+    layout: 'auto',
+    vertex: {
+      module,
+      buffers: [
+        {
+-          arrayStride: 2 * 4, // 2 floats, 4 bytes each
++          arrayStride: 5 * 4, // 5 floats, 4 bytes each
+          attributes: [
+            {shaderLocation: 0, offset: 0, format: 'float32x2'},  // position
++            {shaderLocation: 4, offset: 8, format: 'float32x3'},  // perVertexColor
+          ],
+        },
+        {
+          arrayStride: 6 * 4, // 6 floats, 4 bytes each
+          stepMode: 'instance',
+          attributes: [
+            {shaderLocation: 1, offset:  0, format: 'float32x4'},  // color
+            {shaderLocation: 2, offset: 16, format: 'float32x2'},  // offset
+          ],
+        },
+        {
+          arrayStride: 2 * 4, // 2 floats, 4 bytes each
+          stepMode: 'instance',
+          attributes: [
+            {shaderLocation: 3, offset: 0, format: 'float32x2'},   // scale
+          ],
+        },
+      ],
+    },
+    fragment: {
+      module,
+      targets: [{ format: presentationFormat }],
+    },
+  });
+</pre>
+<p>円の頂点生成コードを更新して、円の外側の端にある頂点に暗い色を、内側の頂点に明るい色を提供します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function createCircleVertices({
+  radius = 1,
+  numSubdivisions = 24,
+  innerRadius = 0,
+  startAngle = 0,
+  endAngle = Math.PI * 2,
+} = {}) {
+-  // 1つのサブディビジョンあたり2つの三角形、1つの三角形あたり3つの頂点、それぞれ5つの値（xyrgb）。
++  // 1つのサブディビジョンあたり2つの三角形、1つの三角形あたり3つの頂点
+  const numVertices = numSubdivisions * 3 * 2;
+-  const vertexData = new Float32Array(numVertices * (2 + 3));
++  // 位置（xy）に2つの32ビット値、色（rgb）に1つの32ビット値
++  // 32ビットの色値は、4つの8ビット値として書き込み/読み取りされます
++  const vertexData = new Float32Array(numVertices * (2 + 1));
++  const colorData = new Uint8Array(vertexData.buffer);
+
+  let offset = 0;
++  let colorOffset = 8;
+  const addVertex = (x, y, r, g, b) =&gt; {
+    vertexData[offset++] = x;
+    vertexData[offset++] = y;
+-    vertexData[offset++] = r;
+-    vertexData[offset++] = g;
+-    vertexData[offset++] = b;
++    offset += 1;  // 色をスキップします
++    colorData[colorOffset++] = r * 255;
++    colorData[colorOffset++] = g * 255;
++    colorData[colorOffset++] = b * 255;
++    colorOffset += 9;  // 余分なバイトと位置をスキップします
+  };
+
++  const innerColor = [1, 1, 1];
++  const outerColor = [0.1, 0.1, 0.1];
+
+  // 1つのサブディビジョンあたり2つの三角形
+  //
+  // 0--1 4
+  // | / /|
+  // |/ / |
+  // 2 3--5
+  for (let i = 0; i &lt; numSubdivisions; ++i) {
+    const angle1 = startAngle + (i + 0) * (endAngle - startAngle) / numSubdivisions;
+    const angle2 = startAngle + (i + 1) * (endAngle - startAngle) / numSubdivisions;
+
+    const c1 = Math.cos(angle1);
+    const s1 = Math.sin(angle1);
+    const c2 = Math.cos(angle2);
+    const s2 = Math.sin(angle2);
+
+    // 最初の三角形
+-    addVertex(c1 * radius, s1 * radius);
+-    addVertex(c2 * radius, s2 * radius);
+-    addVertex(c1 * innerRadius, s1 * innerRadius);
++    addVertex(c1 * radius, s1 * radius, ...outerColor);
++    addVertex(c2 * radius, s2 * radius, ...outerColor);
++    addVertex(c1 * innerRadius, s1 * innerRadius, ...innerColor);
+
+    // 2番目の三角形
+-    addVertex(c1 * innerRadius, s1 * innerRadius);
+-    addVertex(c2 * radius, s2 * radius);
+-    addVertex(c2 * innerRadius, s2 * innerRadius);
++    addVertex(c1 * innerRadius, s1 * innerRadius, ...innerColor);
++    addVertex(c2 * radius, s2 * radius, ...outerColor);
++    addVertex(c2 * innerRadius, s2 * innerRadius, ...innerColor);
+  }
+
+  return {
+    vertexData,
+    numVertices,
+  };
+}
+</pre>
+<p>そして、シェーディングされた円が得られます。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-vertex-buffers-per-vertex-colors.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-vertex-buffers-per-vertex-colors.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<h2 id="wgslの属性はjavascriptの属性と一致する必要はありません"><a id="a-default-values"></a>WGSLの属性はJavaScriptの属性と一致する必要はありません</h2>
+<p>上記では、WGSLで<code class="notranslate" translate="no">perVertexColor</code>属性を次のように<code class="notranslate" translate="no">vec3f</code>として宣言しました。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">struct Vertex {
+  @location(0) position: vec2f,
+  @location(1) color: vec4f,
+  @location(2) offset: vec2f,
+  @location(3) scale: vec2f,
+*  @location(4) perVertexColor: vec3f,
+};
+</pre>
+<p>そして、次のように使用しました。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">@vertex fn vs(
+  vert: Vertex,
+) -&gt; VSOutput {
+  var vsOut: VSOutput;
+  vsOut.position = vec4f(
+      vert.position * vert.scale + vert.offset, 0.0, 1.0);
+*  vsOut.color = vert.color * vec4f(vert.perVertexColor, 1);
+  return vsOut;
+}
+</pre>
+<p><code class="notranslate" translate="no">vec4f</code>として宣言し、次のように使用することもできます。</p>
+<pre class="prettyprint showlinemods notranslate lang-wgsl" translate="no">struct Vertex {
+  @location(0) position: vec2f,
+  @location(1) color: vec4f,
+  @location(2) offset: vec2f,
+  @location(3) scale: vec2f,
+-  @location(4) perVertexColor: vec3f,
++  @location(4) perVertexColor: vec4f,
+};
+
+...
+
+@vertex fn vs(
+  vert: Vertex,
+) -&gt; VSOutput {
+  var vsOut: VSOutput;
+  vsOut.position = vec4f(
+      vert.position * vert.scale + vert.offset, 0.0, 1.0);
+-  vsOut.color = vert.color * vec4f(vert.perVertexColor, 1);
++  vsOut.color = vert.color * vert.perVertexColor;
+  return vsOut;
+}
+</pre>
+<p>そして、他に何も変更しません。JavaScriptでは、まだ頂点ごとに3つの浮動小数点数としてデータを提供しています。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    {
+      arrayStride: 5 * 4, // 5 floats, 4 bytes each
+      attributes: [
+        {shaderLocation: 0, offset: 0, format: 'float32x2'},  // position
+*        {shaderLocation: 4, offset: 8, format: 'float32x3'},  // perVertexColor
+      ],
+    },
+</pre>
+<p>これは、属性がシェーダーで常に4つの値を利用できるため機能します。デフォルトは<code class="notranslate" translate="no">0, 0, 0, 1</code>なので、提供しない値はこれらのデフォルトになります。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-vertex-buffers-per-vertex-colors-3-in-4-out.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-vertex-buffers-per-vertex-colors-3-in-4-out.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<h2 id="正規化された値を使用してスペースを節約する"><a id="a-normalized-attributes"></a>正規化された値を使用してスペースを節約する</h2>
+<p>色のために32ビット浮動小数点値を使用しています。各<code class="notranslate" translate="no">perVertexColor</code>には3つの値があり、頂点ごとの色ごとに合計12バイトになります。各<code class="notranslate" translate="no">color</code>には4つの値があり、インスタンスごとの色ごとに合計16バイトになります。</p>
+<p>8ビット値を使用し、WebGPUに0↔255から0.0↔1.0に正規化するように指示することで、これを最適化できます。</p>
+<p>有効な属性形式のリストを見ると、3値の8ビット形式はありませんが、<code class="notranslate" translate="no">'unorm8x4'</code>があるので、それを使用しましょう。</p>
+<p>まず、頂点を生成するコードを変更して、正規化される8ビット値として色を格納するようにします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function createCircleVertices({
+  radius = 1,
+  numSubdivisions = 24,
+  innerRadius = 0,
+  startAngle = 0,
+  endAngle = Math.PI * 2,
+} = {}) {
+-  // 1つのサブディビジョンあたり2つの三角形、1つの三角形あたり3つの頂点、それぞれ5つの値（xyrgb）。
++  // 1つのサブディビジョンあたり2つの三角形、1つの三角形あたり3つの頂点
+  const numVertices = numSubdivisions * 3 * 2;
+-  const vertexData = new Float32Array(numVertices * (2 + 3));
++  // 位置（xy）に2つの32ビット値、色（rgb_）に1つの32ビット値
++  // 32ビットの色値は、4つの8ビット値として書き込み/読み取りされます
++  const vertexData = new Float32Array(numVertices * (2 + 1));
++  const colorData = new Uint8Array(vertexData.buffer);
+
+  let offset = 0;
++  let colorOffset = 8;
+  const addVertex = (x, y, r, g, b) =&gt; {
+    vertexData[offset++] = x;
+    vertexData[offset++] = y;
+-    vertexData[offset++] = r;
+-    vertexData[offset++] = g;
+-    vertexData[offset++] = b;
++    offset += 1;  // 色をスキップします
++    colorData[colorOffset++] = r * 255;
++    colorData[colorOffset++] = g * 255;
++    colorData[colorOffset++] = b * 255;
++    colorOffset += 9;  // 余分なバイトと位置をスキップします
+  };
+</pre>
+<p>上記では、<code class="notranslate" translate="no">vertexData</code>と同じデータの<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array"><code class="notranslate" translate="no">Uint8Array</code></a>ビューである<code class="notranslate" translate="no">colorData</code>を作成します。これが不明な場合は、<a href="webgpu-memory-layout.html#multiple-views-of-the-same-arraybuffer">データメモリレイアウトに関する記事</a>を確認してください。</p>
+<p>次に、<code class="notranslate" translate="no">colorData</code>を使用して色を挿入し、0↔1から0↔255に展開します。</p>
+<p>この（頂点ごとの）データのメモリレイアウトは次のようになります。</p>
+<div class="webgpu_center"><img src="../resources/vertex-buffer-f32x2-u8x4.svg" style="width: 1024px;"></div>
+<p>また、インスタンスごとのデータを更新する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const kNumObjects = 100;
+  const objectInfos = [];
+
+  // 2つの頂点バッファを作成します
+  const staticUnitSize =
+-    4 * 4 + // colorは4つの32ビット浮動小数点数（各4バイト）です
++    4 +     // colorは4バイトです
+    2 * 4;  // offsetは2つの32ビット浮動小数点数（各4バイト）です
+  const changingUnitSize =
+    2 * 4;  // scaleは2つの32ビット浮動小数点数（各4バイト）です
+*  const staticVertexBufferSize = staticUnitSize * kNumObjects;
+*  const changingVertexBufferSize = changingUnitSize * kNumObjects;
+
+*  const staticVertexBuffer = device.createBuffer({
+*    label: 'static vertex for objects',
+*    size: staticVertexBufferSize,
+-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
++    usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+  });
+
+*  const changingVertexBuffer = device.createBuffer({
+*    label: 'changing vertex for objects',
+*    size: changingVertexBufferSize,
+-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
++    usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+  });
+
+  // float32インデックスでのさまざまなユニフォーム値へのオフセット
+  const kColorOffset = 0;
+-  const kOffsetOffset = 4;
++  const kOffsetOffset = 1;
+
+  const kScaleOffset = 0;
+
+  {
+-    const staticVertexValues = new Float32Array(staticVertexBufferSize / 4);
++    const staticVertexValuesU8 = new Uint8Array(staticVertexBufferSize);
++    const staticVertexValuesF32 = new Float32Array(staticVertexValuesU8.buffer);
+    for (let i = 0; i &lt; kNumObjects; ++i) {
+-      const staticOffset = i * (staticUnitSize / 4);
++      const staticOffsetU8 = i * staticUnitSize;
++      const staticOffsetF32 = staticOffsetU8 / 4;
+
+      // これらは一度だけ設定されるので、今すぐ設定します
+-      staticVertexValues.set([rand(), rand(), rand(), 1], staticOffset + kColorOffset);        // 色を設定します
+-      staticVertexValues.set([rand(-0.9, 0.9), rand(-0.9, 0.9)], staticOffset + kOffsetOffset);      // オフセットを設定します
++      staticVertexValuesU8.set(        // 色を設定します
++          [rand() * 255, rand() * 255, rand() * 255, 255],
++          staticOffsetU8 + kColorOffset);
++
++      staticVertexValuesF32.set(      // オフセットを設定します
++          [rand(-0.9, 0.9), rand(-0.9, 0.9)],
++          staticOffsetF32 + kOffsetOffset);
+
+      objectInfos.push({
+        scale: rand(0.2, 0.5),
+      });
+    }
+-    device.queue.writeBuffer(staticVertexBuffer, 0, staticVertexValues);
++    device.queue.writeBuffer(staticVertexBuffer, 0, staticVertexValuesF32);
+  }
+</pre>
+<p>インスタンスごとのデータのレイアウトは次のようになります。</p>
+<div class="webgpu_center"><img src="../resources/vertex-buffer-u8x4-f32x2.svg" style="width: 1024px;"></div>
+<p>次に、パイプラインを変更して、データを8ビット符号なし値として取得し、それらを0↔1に正規化し、オフセットを更新し、ストライドを新しいサイズに更新する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const pipeline = device.createRenderPipeline({
+    label: 'per vertex color',
+    layout: 'auto',
+    vertex: {
+      module,
+      buffers: [
+        {
+-          arrayStride: 5 * 4, // 5 floats, 4 bytes each
++          arrayStride: 2 * 4 + 4, // 2 floats, 4 bytes each + 4 bytes
+          attributes: [
+            {shaderLocation: 0, offset: 0, format: 'float32x2'},  // position
+-            {shaderLocation: 4, offset: 8, format: 'float32x3'},  // perVertexColor
++            {shaderLocation: 4, offset: 8, format: 'unorm8x4'},   // perVertexColor
+          ],
+        },
+        {
+-          arrayStride: 6 * 4, // 6 floats, 4 bytes each
++          arrayStride: 4 + 2 * 4, // 4 bytes + 2 floats, 4 bytes each
+          stepMode: 'instance',
+          attributes: [
+-            {shaderLocation: 1, offset:  0, format: 'float32x4'},  // color
+-            {shaderLocation: 2, offset: 16, format: 'float32x2'},  // offset
++            {shaderLocation: 1, offset: 0, format: 'unorm8x4'},   // color
++            {shaderLocation: 2, offset: 4, format: 'float32x2'},  // offset
+          ],
+        },
+        {
+          arrayStride: 2 * 4, // 2 floats, 4 bytes each
+          stepMode: 'instance',
+          attributes: [
+            {shaderLocation: 3, offset: 0, format: 'float32x2'},   // scale
+          ],
+        },
+      ],
+    },
+    fragment: {
+      module,
+      targets: [{ format: presentationFormat }],
+    },
+  });
+</pre>
+<p>そして、それで少しスペースを節約しました。頂点ごとに20バイトを使用していましたが、現在は頂点ごとに12バイトを使用しており、40％の節約になります。そして、インスタンスごとに24バイトを使用していましたが、現在は12バイトを使用しており、50％の節約になります。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-vertex-buffers-8bit-colors.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-vertex-buffers-8bit-colors.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p>構造体を使用する必要はないことに注意してください。これも同様に機能します。</p>
+<pre class="prettyprint showlinemods notranslate lang-WGSL" translate="no">@vertex fn vs(
+-  vert: Vertex,
++  @location(0) position: vec2f,
++  @location(1) color: vec4f,
++  @location(2) offset: vec2f,
++  @location(3) scale: vec2f,
++  @location(4) perVertexColor: vec3f,
+) -&gt; VSOutput {
+  var vsOut: VSOutput;
+-  vsOut.position = vec4f(
+-      vert.position * vert.scale + vert.offset, 0.0, 1.0);
+-  vsOut.color = vert.color * vec4f(vert.perVertexColor, 1);
++  vsOut.position = vec4f(
++      position * scale + offset, 0.0, 1.0);
++  vsOut.color = color * vec4f(perVertexColor, 1);
+  return vsOut;
+}
+</pre>
+<p>繰り返しになりますが、WebGPUが気にするのは、シェーダーで<code class="notranslate" translate="no">locations</code>を定義し、APIを介してそれらの場所にデータを提供することだけです。</p>
+<h2 id="インデックスバッファ"><a id="a-index-buffers"></a>インデックスバッファ</h2>
+<p>ここで説明する最後のことは、インデックスバッファです。インデックスバッファは、頂点を処理して使用する順序を記述します。</p>
+<p><code class="notranslate" translate="no">draw</code>は、頂点を順番に処理すると考えることができます。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">0, 1, 2, 3, 4, 5, .....
+</pre>
+<p>インデックスバッファを使用すると、その順序を変更できます。</p>
+<p>円のサブディビジョンごとに6つの頂点を作成していましたが、そのうち2つは同一でした。</p>
+<div class="webgpu_center"><img src="../resources/vertices-non-indexed.svg" style="width: 400px"></div>  
+<p>代わりに、4つだけ作成し、インデックスを使用して、WebGPUに次の順序でインデックスを描画するように指示することで、それらの4つの頂点を6回使用します。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">0, 1, 2, 2, 1, 3, ...
+</pre>
+<div class="webgpu_center"><img src="../resources/vertices-indexed.svg" style="width: 400px"></div>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function createCircleVertices({
+  radius = 1,
+  numSubdivisions = 24,
+  innerRadius = 0,
+  startAngle = 0,
+  endAngle = Math.PI * 2,
+} = {}) {
+-  // 1つのサブディビジョンあたり2つの三角形、1つの三角形あたり3つの頂点
+-  const numVertices = numSubdivisions * 3 * 2;
++  // 各サブディビジョンに2つの頂点、+円を一周するための1つ。
++  const numVertices = (numSubdivisions + 1) * 2;
+  // 位置（xy）に2つの32ビット値、色（rgb）に1つの32ビット値
+  // 32ビットの色値は、4つの8ビット値として書き込み/読み取りされます
+  const vertexData = new Float32Array(numVertices * (2 + 1));
+  const colorData = new Uint8Array(vertexData.buffer);
+
+  let offset = 0;
++  let colorOffset = 8;
+  const addVertex = (x, y, r, g, b) =&gt; {
+    vertexData[offset++] = x;
+    vertexData[offset++] = y;
++    offset += 1;  // 色をスキップします
++    colorData[colorOffset++] = r * 255;
++    colorData[colorOffset++] = g * 255;
++    colorData[colorOffset++] = b * 255;
++    colorOffset += 9;  // 余分なバイトと位置をスキップします
+  };
++  const innerColor = [1, 1, 1];
++  const outerColor = [0.1, 0.1, 0.1];
+
+-  // 1つのサブディビジョンあたり2つの三角形
+-  //
+-  // 0--1 4
+-  // | / /|
+-  // |/ / |
+-  // 2 3--5
+-  for (let i = 0; i &lt; numSubdivisions; ++i) {
+-    const angle1 = startAngle + (i + 0) * (endAngle - startAngle) / numSubdivisions;
+-    const angle2 = startAngle + (i + 1) * (endAngle - startAngle) / numSubdivisions;
+-
+-    const c1 = Math.cos(angle1);
+-    const s1 = Math.sin(angle1);
+-    const c2 = Math.cos(angle2);
+-    const s2 = Math.sin(angle2);
+-
+-    // 最初の三角形
+-    addVertex(c1 * radius, s1 * radius);
+-    addVertex(c2 * radius, s2 * radius);
+-    addVertex(c1 * innerRadius, s1 * innerRadius);
+-
+-    // 2番目の三角形
+-    addVertex(c1 * innerRadius, s1 * innerRadius);
+-    addVertex(c2 * radius, s2 * radius);
+-    addVertex(c2 * innerRadius, s2 * innerRadius);
+-  }
++  // 1つのサブディビジョンあたり2つの三角形
++  //
++  // 0  2  4  6  8 ...
++  //
++  // 1  3  5  7  9 ...
++  for (let i = 0; i &lt;= numSubdivisions; ++i) {
++    const angle = startAngle + (i + 0) * (endAngle - startAngle) / numSubdivisions;
++
++    const c1 = Math.cos(angle);
++    const s1 = Math.sin(angle);
++
++    addVertex(c1 * radius, s1 * radius, ...outerColor);
++    addVertex(c1 * innerRadius, s1 * innerRadius, ...innerColor);
++  }
+
++  const indexData = new Uint32Array(numSubdivisions * 6);
++  let ndx = 0;
++
++  // 1番目の三角形  2番目の三角形  3番目の三角形  4番目の三角形
++  // 0 1 2    2 1 3    2 3 4    4 3 5
++  //
++  // 0--2        2     2--4        4  .....
++  // | /        /|     | /        /|
++  // |/        / |     |/        / |
++  // 1        1--3     3        3--5  .....
++  for (let i = 0; i &lt; numSubdivisions; ++i) {
++    const ndxOffset = i * 2;
++
++    // 最初の三角形
++    indexData[ndx++] = ndxOffset;
++    indexData[ndx++] = ndxOffset + 1;
++    indexData[ndx++] = ndxOffset + 2;
++
++    // 2番目の三角形
++    indexData[ndx++] = ndxOffset + 2;
++    indexData[ndx++] = ndxOffset + 1;
++    indexData[ndx++] = ndxOffset + 3;
++  }
+
+  return {
+    vertexData,
++    indexData,
+-    numVertices,
++    numVertices: indexData.length,
+  };
+}
+</pre>
+<p>次に、インデックスバッファを作成する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  const { vertexData, numVertices } = createCircleVertices({
++  const { vertexData, indexData, numVertices } = createCircleVertices({
+    radius: 0.5,
+    innerRadius: 0.25,
+  });
+  const vertexBuffer = device.createBuffer({
+    label: 'vertex buffer',
+    size: vertexData.byteLength,
+    usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+  });
+  device.queue.writeBuffer(vertexBuffer, 0, vertexData);
++  const indexBuffer = device.createBuffer({
++    label: 'index buffer',
++    size: indexData.byteLength,
++    usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
++  });
++  device.queue.writeBuffer(indexBuffer, 0, indexData);
+</pre>
+<p>使用法を<code class="notranslate" translate="no">INDEX</code>に設定したことに注意してください。</p>
+<p>最後に、描画時にインデックスバッファを指定する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    pass.setPipeline(pipeline);
+    pass.setVertexBuffer(0, vertexBuffer);
+    pass.setVertexBuffer(1, staticVertexBuffer);
+    pass.setVertexBuffer(2, changingVertexBuffer);
++    pass.setIndexBuffer(indexBuffer, 'uint32');
+</pre>
+<p>バッファには32ビット符号なし整数インデックスが含まれているため、ここで<code class="notranslate" translate="no">'uint32'</code>を渡す必要があります。16ビット符号なしインデックスを使用することもでき、その場合は<code class="notranslate" translate="no">'uint16'</code>を渡します。</p>
+<p>そして、<code class="notranslate" translate="no">draw</code>の代わりに<code class="notranslate" translate="no">drawIndexed</code>を呼び出す必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-    pass.draw(numVertices, kNumObjects);
++    pass.drawIndexed(numVertices, kNumObjects);
+</pre>
+<p>これで、スペースを少し節約し（33％）、頂点シェーダーで頂点を計算するときの処理も同様に節約できる可能性があります。GPUがすでに計算した頂点を再利用できる可能性があるためです。</p>
+<p></p><div class="webgpu_example_container">
+  <div><iframe class="webgpu_example" style=" " src="/webgpu/resources/editor.html?url=/webgpu/lessons/..%2Fwebgpu-vertex-buffers-index-buffer.html"></iframe></div>
+  <a class="webgpu_center" href="/webgpu/lessons/../webgpu-vertex-buffers-index-buffer.html" target="_blank">クリックして別のウインドウを開く</a>
+</div>
+
+<p></p>
+<p><a href="webgpu-storage-buffers.html">前の記事</a>のストレージバッファの例で、インデックスバッファを使用することもできたことに注意してください。その場合、渡される<code class="notranslate" translate="no">@builtin(vertex_index)</code>の値は、インデックスバッファのインデックスと一致します。</p>
+<p>次は<a href="webgpu-textures.html">テクスチャ</a>について説明します。</p>
+
+    </div>
+    <div class="lesson-sidebar">
+        <select class="language">
+    <option value="/webgpu/lessons/webgpu-vertex-buffers.html">English
+    </option><option value="/webgpu/lessons/es/webgpu-vertex-buffers.html">Spanish
+    </option><option value="/webgpu/lessons/ja/webgpu-vertex-buffers.html" selected="">日本語
+    </option><option value="/webgpu/lessons/ko/webgpu-vertex-buffers.html">한국어
+    </option><option value="/webgpu/lessons/ru/webgpu-vertex-buffers.html">Русский
+    </option><option value="/webgpu/lessons/tr/webgpu-vertex-buffers.html">Türkçe
+    </option><option value="/webgpu/lessons/uk/webgpu-vertex-buffers.html">Українська
+    </option><option value="/webgpu/lessons/zh_cn/webgpu-vertex-buffers.html">简体中文
+</option></select>
+
+
+        <div id="toc">
+          <ul>  <li>基本</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-fundamentals.html">基本</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-inter-stage-variables.html">inter-stage変数</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-uniforms.html">ユニフォーム</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-storage-buffers.html">ストレージバッファ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-vertex-buffers.html">頂点バッファ</a></li>
+  <li>テクスチャ</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-textures.html">テクスチャ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-importing-textures.html">画像の読み込み</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-textures-external-video.html">ビデオの使用</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-cube-maps.html">キューブマップ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-storage-textures.html">ストレージテクスチャ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-multisampling.html">マルチサンプリング / MSAA</a></li>
+        </ul>
+<li><a href="/webgpu/lessons/ja/webgpu-constants.html">定数</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-memory-layout.html">構造体とメモリレイアウト</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-transparency.html">透明度とブレンディング</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-bind-group-layouts.html">バインドグループレイアウト</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-copying-data.html">データのコピー</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-limits-and-features.html">オプション機能と制限</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-timing.html">タイミングパフォーマンス</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-wgsl.html">WGSL</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-how-it-works.html">仕組み</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-compatibility-mode.html">互換モード</a></li>
+        </ul>
+  <li>3Dの数学</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-translation.html">平行移動</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-rotation.html">回転</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-scale.html">スケール</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-matrix-math.html">行列演算</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-orthographic-projection.html">正射影</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-perspective-projection.html">透視投影</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-cameras.html">カメラ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-matrix-stacks.html">行列スタック</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-scene-graphs.html">シーングラフ</a></li>
+        </ul>
+  <li>ライト</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-lighting-directional.html">指向性ライティング</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-lighting-point.html">点光源</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-lighting-spot.html">スポットライト</a></li>
+        </ul>
+  <li>テクニック</li>
+        <ul>
+            <li>2D</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-large-triangle-to-cover-clip-space.html">大きなクリップ空間の三角形</a></li>
+        </ul>
+  <li>3D</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-environment-maps.html">環境マップ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-skybox.html">スカイボックス</a></li>
+        </ul>
+  <li>ポストプロセッシング</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-post-processing.html">基本的なCRTエフェクト</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-image-adjustments.html">Image Adjustments</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-1dlut.html">1D Lookup Table (LUT)</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-3dlut.html">3D Lookup Table (LUT)</a></li>
+        </ul>
+        </ul>
+  <li>コンピュートシェーダ</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-compute-shaders.html">コンピュートシェーダーの基本</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-compute-shaders-histogram.html">画像ヒストグラム</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-compute-shaders-histogram-part-2.html">画像ヒストグラム パート2</a></li>
+        </ul>
+  <li>その他のトピック</li>
+        <ul>
+          <li><a href="/webgpu/lessons/ja/webgpu-resizing-the-canvas.html">Resizing the Canvas</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-multiple-canvases.html">複数のキャンバス</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-points.html">ポイント</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-from-webgl.html">WebGLからWebGPUへ</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-optimization.html">速度と最適化</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-debugging.html">デバッグとエラー</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-resources.html">リソース / 参考文献</a></li>
+<li><a href="/webgpu/lessons/ja/webgpu-wgsl-function-reference.html">WGSL 関数リファレンス</a></li>
+<li><a href="/webgpu/lessons/resources/wgsl-offset-computer.html">WGSL オフセット計算機</a></li>
+        </ul></ul>
+<ul>
+  <li><a href="https://github.com/webgpu/webgpufundamentals">github</a></li>
+  <li><a href="https://google.github.io/tour-of-wgsl/">Tour of WGSL</a></li>
+  <li><a href="https://gpuweb.github.io/types/">WebGPU API Reference</a></li>
+  <li><a href="https://www.w3.org/TR/webgpu/">WebGPU Spec</a></li>
+  <li><a href="https://www.w3.org/TR/WGSL/">WGSL Spec</a></li>
+  <li><a href="https://webgpureport.org">WebGPUReport.org</a></li>
+  <li><a href="https://web3dsurvey.com/webgpu">Web3DSurvey.com</a></li>
+</ul>
+        </div>
+    </div>
+    <div class="lesson-comments">
+        <div>問題点/バグ? <a href="https://github.com/webgpu/webgpufundamentals/issues">githubでissueを作成</a>.</div>
+
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_config = function () {
+              this.page.url = `${window.location.origin}${window.location.pathname}`;
+              this.page.identifier = `WebGPU 頂点バッファ`;
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+                if (window.location.hostname.indexOf("webgpufundamentals.org") < 0) {
+                    return;
+                }
+                var d = document, s = d.createElement('script');
+                s.src = 'https://webgpufundamentals-org.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+  </div>
+</div>
+
+<script>
+const settings = {
+  contribTemplate: "Thank you <a href=\"${html_url}\"><img src=\"${avatar_url}\"> ${login}</a><br>for <a href=\"https://github.com/${owner}/${repo}/commits?author=${login}\">${contributions} contributions</a>",
+  owner: "gfxfundamentals",
+  repo: "webgpufundamentals",
+};
+</script>
+<script src="/contributors.js"></script>
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+<script src="/3rdparty/jquery-3.3.1.slim.min.js"></script>
+<script src="/webgpu/lessons/resources/js/prettify.js"></script>
+<script src="/webgpu/lessons/resources/js/lesson.js" type="module"></script>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-92BFT5PE4H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-92BFT5PE4H');
+</script>
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,37 @@
+{
+  language: 'Spanish',
+  defaultExampleCaption: "haz click aquí para abrir el enlace en una ventana nueva",
+  title: 'Fundamentos sobre WebGPU',
+  description: 'Aprende webgpu',
+  link: 'http://webgpufundamentals.org/webgpu/lessons/es',
+  commentSectionHeader: `
+    <div>¿Dudas? <a href="http://stackoverflow.com/questions/tagged/webgpu">Pregunta en StackOverflow</a>.</div>
+    <div>
+      ¿<a href="https://github.com/webgpu/webgpufundamentals/issues/new?assignees=&labels=suggested+topic&template=suggest-topic.md&title=%5BSUGGESTION%5D">Sugerencia</a>?
+      ¿<a href="https://github.com/webgpu/webgpufundamentals/issues/new?assignees=&labels=&template=request.md&title=">Solicitud</a>?
+      ¿<a href="https://github.com/webgpu/webgpufundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Problemas</a>?
+      ¿<a href="https://github.com/webgpu/webgpufundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Bug</a>?
+    </div>
+    `,
+  missing: `
+Lo sentimos, este artículo aún no ha sido traducido.
+
+[Cualquier ayuda con la traducción es bien recibida](https://github.com/webgpu/webgpufundamentals)! 😄
+
+[Aquí está el artículo original en inglés por ahora]({{{origLink}}}).
+`,
+  toc: "Índice",
+  categoryMapping: {
+    'basics': 'Lo básico',
+    'misc': 'Miscelánea',
+    'textures': 'Texturas',
+    'techniques': 'Técnicas',
+    '3d': '3D',
+    '2d': '2D',
+    'reference': 'Referencia',
+    '3d-math': 'Matemáticas 3D',
+    'lighting': 'Iluminación',
+    'compute-shaders': 'Shaders de Cálculo',
+    'post-processing': 'Post Procesado',
+  },
+}
